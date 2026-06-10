@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 1 — EKS Cluster Foundations · EKS Skill Track</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@300;400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#eef2f7; --bg2:#ffffff; --bg3:#f0f4f9; --border:#d0dae8;
+    --text:#1a2332; --text-dim:#4a5568; --text-dimmer:#8fa3bc;
+    --blue:#1a6eb5; --blue-light:#e8f1fb; --blue-mid:#b8d0ed; --blue-dark:#0f4a7a;
+    --pm:#1a6eb5; --pm-light:#e8f1fb; --pm-mid:#b8d0ed; --pm-dark:#0f4a7a;
+    --coral:#c0392b; --coral-light:#fdf0ee; --coral-mid:#f0b8b2;
+    --green:#1a6b3a; --green-light:#e8f5ed; --green-mid:#a3d4b8;
+    --amber:#92600a; --amber-light:#fdf3e3; --amber-mid:#e8cf9a;
+    --code-bg:#1e2433; --code-text:#cdd6f4; --radius:12px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Merriweather Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+  .topnav { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; height:52px; display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:var(--text-dim); }
+  .topnav a { color:var(--pm); text-decoration:none; }
+  .topnav a:hover { text-decoration:underline; }
+  .sep { opacity:.4; }
+
+  /* Module header band */
+  .module-band { background:var(--bg2); border-bottom:1px solid var(--border); padding:24px 40px; }
+  .module-eyebrow { font-size:13px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+  .module-title { font-size:26px; font-weight:700; color:var(--text); }
+  .module-progress { font-size:13px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); margin-top:10px; }
+
+  /* Refresher primer */
+  .refresh-wrap { max-width:1100px; margin:18px auto 0; padding:0 32px; }
+  .refresh-toggle { width:100%; display:flex; align-items:center; gap:12px; padding:16px 20px; background:var(--blue-light); border:1.5px solid var(--blue-mid); border-left:3px solid var(--blue); border-radius:var(--radius); cursor:pointer; font-family:'Merriweather Sans',sans-serif; font-size:15.5px; font-weight:700; color:var(--blue-dark); text-align:left; transition:background .15s; }
+  .refresh-toggle:hover { background:var(--blue-light); border-color:var(--blue); }
+  .refresh-toggle .rt-icon { font-size:20px; flex-shrink:0; }
+  .refresh-toggle .rt-text { flex:1; }
+  .refresh-toggle .rt-sub { display:block; font-weight:400; font-size:13px; color:var(--text-dim); margin-top:3px; }
+  .refresh-toggle .rt-chev { font-size:13px; font-family:'Source Code Pro',monospace; transition:transform .2s; flex-shrink:0; }
+  .refresh-toggle.open .rt-chev { transform:rotate(180deg); }
+  .refresh-panel { display:none; margin-top:14px; background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--radius); padding:30px 34px; animation:fadeIn .25s ease; }
+  .refresh-panel.open { display:block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+  .refresh-panel h3 { font-size:20px; font-weight:700; color:var(--text); margin:26px 0 10px; }
+  .refresh-panel h3:first-child { margin-top:0; }
+  .refresh-panel h4 { font-size:16px; font-weight:700; color:var(--blue-dark); margin:18px 0 6px; }
+  .refresh-panel p { font-size:16px; color:var(--text-dim); line-height:1.8; margin-bottom:12px; }
+  .refresh-panel p strong { color:var(--text); font-weight:600; }
+  .refresh-panel ul { margin:0 0 14px; padding-left:22px; }
+  .refresh-panel li { font-size:15.5px; color:var(--text-dim); line-height:1.75; margin-bottom:8px; }
+  .refresh-panel li strong { color:var(--text); font-weight:600; }
+  .rf-eg { border-left:3px solid var(--green); background:var(--green-light); padding:12px 16px; border-radius:0 8px 8px 0; margin:8px 0 16px; font-size:14.5px; line-height:1.7; color:var(--text-dim); }
+  .rf-eg .eg-label { font-size:11px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--green); margin-bottom:5px; }
+  .rf-eg strong { color:var(--text); }
+  .rf-table { width:100%; border-collapse:collapse; margin:8px 0 4px; }
+  .rf-table th, .rf-table td { text-align:left; padding:10px 14px; border:1px solid var(--border); font-size:14.5px; vertical-align:top; }
+  .rf-table th { background:var(--bg3); font-weight:700; color:var(--text); }
+  .rf-table td { color:var(--text-dim); line-height:1.65; }
+  .rf-bridge { font-size:16px; color:var(--text-dim); line-height:1.8; margin:6px 0 18px; padding:14px 18px; background:var(--bg3); border-radius:8px; }
+  .rf-bridge strong { color:var(--text); font-weight:600; }
+  .refresh-close { margin-top:20px; padding:10px 20px; background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .refresh-close:hover { background:var(--bg3); }
+
+  /* Section pills */
+  .section-pills-wrap { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 40px; overflow-x:auto; }
+  .section-pills { display:flex; gap:0; }
+  .section-pill {
+    display:flex; align-items:center; gap:8px; padding:14px 18px;
+    font-size:15px; font-weight:700; color:var(--text-dimmer);
+    border-bottom:2px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none;
+    white-space:nowrap; transition:color .15s; font-family:'Merriweather Sans',sans-serif;
+  }
+  .section-pill .pnum {
+    width:26px; height:26px; border-radius:50%; background:var(--bg3); border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;
+    font-family:'Source Code Pro',monospace; flex-shrink:0; transition:all .15s;
+  }
+  .section-pill.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .section-pill.active .pnum { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .section-pill.done .pnum { background:var(--green); border-color:var(--green); color:#fff; }
+
+  .main { max-width:1100px; margin:0 auto; padding:32px; }
+
+  /* Section panel */
+  .section-panel { display:none; }
+  .section-panel.active { display:block; }
+
+  /* Tab row (within a section) */
+  .tabs-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; padding:0 8px; overflow-x:auto; }
+  .tabs { display:flex; gap:0; }
+  .tab-btn {
+    display:flex; align-items:center; gap:9px; padding:12px 16px;
+    font-size:14.5px; font-weight:700; color:var(--text-dimmer);
+    border-bottom:2px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none;
+    white-space:nowrap; transition:color .15s; font-family:'Merriweather Sans',sans-serif;
+  }
+  .tab-btn .num { width:24px; height:24px; border-radius:50%; background:var(--bg3); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; font-family:'Source Code Pro',monospace; flex-shrink:0; transition:all .15s; }
+  .tab-btn .tab-caption-wrap { display:flex; flex-direction:column; align-items:flex-start; line-height:1.15; }
+  .tab-btn .tab-name { font-size:14.5px; }
+  .tab-btn .tab-verb { font-size:10.5px; font-family:'Source Code Pro',monospace; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dimmer); margin-top:2px; }
+  .tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .tab-btn.active .num { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .tab-btn.active .tab-verb { color:var(--blue); }
+
+  .tab-body { background:var(--bg2); border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); padding:32px; }
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
+
+  .tab-label { font-size:13px; font-family:'Source Code Pro',monospace; font-weight:700; color:var(--blue); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+  .tab-heading { font-size:23px; font-weight:700; margin-bottom:18px; }
+
+  .prose { font-size:16.5px; color:var(--text-dim); line-height:1.85; margin-bottom:18px; }
+  .prose strong { color:var(--text); font-weight:600; }
+  .prose code, .inline-code { font-family:'Source Code Pro',monospace; font-size:0.88em; background:var(--bg3); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:var(--blue-dark); }
+
+  .callout { border-left:3px solid var(--blue); background:var(--blue-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; line-height:1.7; color:var(--text-dim); }
+  .callout-warn { border-left-color:var(--amber); background:var(--amber-light); }
+  .callout-bad  { border-left-color:var(--coral); background:var(--coral-light); }
+  .callout-good { border-left-color:var(--green); background:var(--green-light); }
+  .callout strong { color:var(--text); }
+
+  .example-block { background:var(--bg3); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin:18px 0; font-size:15.5px; line-height:1.8; color:var(--text-dim); }
+  .example-block .ex-label { font-size:12px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px; }
+
+  /* Well-Architected pillar tags */
+  .wa-pillar { display:inline-flex; align-items:center; gap:6px; font-family:'Source Code Pro',monospace; font-size:11.5px; font-weight:600; letter-spacing:.04em; padding:4px 10px; border-radius:20px; border:1.5px solid var(--blue-mid); background:var(--blue-light); color:var(--blue-dark); margin:0 6px 8px 0; }
+  .wa-pillar::before { content:"▲"; font-size:9px; }
+  .wa-legend { font-size:13px; color:var(--text-dimmer); font-family:'Source Code Pro',monospace; margin:2px 0 14px; }
+  .bp-item { margin:0 0 18px; }
+  .bp-item .bp-head { font-size:16.5px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .bp-item .bp-body { font-size:15.5px; color:var(--text-dim); line-height:1.8; }
+  .bp-item .bp-body strong { color:var(--text); }
+
+  /* Lab tab */
+  .lab-caveat { border-left:3px solid var(--amber); background:var(--amber-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:0 0 22px; font-size:14px; line-height:1.7; color:var(--text-dim); }
+  .lab-caveat strong { color:var(--text); }
+  .lab-step { margin:0 0 22px; }
+  .lab-step-head { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .lab-step-head .ls-num { width:24px; height:24px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; font-family:'Source Code Pro',monospace; flex-shrink:0; }
+  .lab-step p { font-size:15px; color:var(--text-dim); line-height:1.75; margin-bottom:10px; }
+  .code-block { position:relative; background:var(--code-bg); color:var(--code-text); border-radius:10px; padding:16px 18px; margin:10px 0 6px; font-family:'Source Code Pro',monospace; font-size:13.5px; line-height:1.7; overflow-x:auto; white-space:pre; }
+  .code-block .copy-btn { position:absolute; top:10px; right:10px; background:rgba(255,255,255,.12); color:#cdd6f4; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-family:'Source Code Pro',monospace; font-weight:600; cursor:pointer; letter-spacing:.05em; }
+  .code-block .copy-btn:hover { background:rgba(255,255,255,.22); }
+  .code-block .cmt { color:#8fa3bc; }
+  .lab-cleanup { border-left:3px solid var(--coral); background:var(--coral-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0 0; font-size:14px; line-height:1.7; color:var(--text-dim); }
+  .lab-cleanup strong { color:var(--text); }
+
+  .divider { height:1px; background:var(--border); margin:26px 0; }
+  .tab-nav-row { display:flex; justify-content:space-between; margin-top:24px; }
+  .continue-btn { padding:11px 22px; background:var(--blue); color:#fff; border:none; border-radius:8px; font-size:14.5px; font-weight:700; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; }
+  .continue-btn:hover { background:var(--blue-dark); }
+  .ghost-btn { padding:11px 20px; background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .ghost-btn:hover { background:var(--bg3); }
+  .ghost-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+  /* Assessment */
+  .assessment-sub { font-size:14.5px; color:var(--text-dim); line-height:1.7; margin-bottom:22px; }
+  .question-block { margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--border); }
+  .question-block:last-of-type { border-bottom:none; }
+  .q-num { font-size:11px; font-family:'Source Code Pro',monospace; color:var(--blue); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; font-weight:600; }
+  .q-text { font-size:15.5px; font-weight:600; color:var(--text); line-height:1.5; margin-bottom:14px; }
+  .options { display:flex; flex-direction:column; gap:10px; }
+  .option { display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border-radius:8px; border:1.5px solid var(--border); cursor:pointer; font-size:14.5px; color:var(--text-dim); line-height:1.5; transition:border-color .15s, background .15s; }
+  .option:hover { border-color:var(--blue-mid); background:var(--blue-light); }
+  .option input[type="radio"] { margin-top:3px; flex-shrink:0; accent-color:var(--blue); }
+  .submit-btn { margin-top:18px; padding:12px 28px; background:var(--blue); color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .submit-btn:disabled { background:var(--border); color:var(--text-dimmer); cursor:not-allowed; }
+  .submit-btn:not(:disabled):hover { background:var(--blue-dark); }
+  .submit-note { font-size:13px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); margin-top:8px; }
+  .submitted-wrap { text-align:center; padding:16px 0; }
+  .submitted-icon { font-size:34px; color:var(--green); margin-bottom:6px; }
+  .submitted-title { font-size:17px; font-weight:700; color:var(--green); margin-bottom:8px; }
+  .submitted-body { font-size:14.5px; color:var(--text-dim); line-height:1.7; }
+
+  .hidden { display:none !important; }
+
+  .bottom-nav { display:flex; justify-content:space-between; padding:28px 0 0; border-top:1px solid var(--border); margin-top:32px; }
+  .nav-btn { padding:12px 20px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; text-decoration:none; font-family:'Merriweather Sans',sans-serif; background:var(--blue); color:#fff; border:none; }
+  .nav-btn:hover { background:var(--blue-dark); }
+  .nav-btn.back { background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); }
+
+  footer { text-align:center; padding:26px 32px; font-size:11px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); border-top:1px solid var(--border); line-height:1.7; }
+  footer .attrib { display:block; margin-top:6px; opacity:.85; font-style:italic; }
+
+  /* Auth */
+  .auth-overlay { position:fixed; inset:0; background:rgba(15,30,60,.7); display:flex; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(4px); }
+  .auth-overlay.hidden { display:none; }
+  .auth-box { background:#fff; border-radius:16px; padding:48px 40px; max-width:420px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+  .auth-logo { font-size:32px; margin-bottom:16px; }
+  .auth-title { font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .auth-sub { font-size:15px; color:var(--text-dim); line-height:1.6; margin-bottom:28px; }
+  .auth-google-btn { display:flex; align-items:center; justify-content:center; gap:12px; width:100%; padding:14px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; }
+  .auth-google-btn:hover { background:var(--blue-dark); }
+  .auth-google-btn svg { width:20px; height:20px; flex-shrink:0; }
+  .auth-divider { display:flex; align-items:center; gap:10px; margin:16px 0 14px; color:var(--text-dimmer); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  .auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .auth-input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:10px; outline:none; font-family:'Merriweather Sans',sans-serif; color:var(--text); background:#fff; display:block; }
+  .auth-input:focus { border-color:var(--blue); }
+  .auth-email-btn { display:block; width:100%; padding:14px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; margin-top:2px; }
+  .auth-email-btn:hover { background:var(--blue-dark); }
+  .auth-error { font-size:13px; color:var(--coral); margin-top:12px; font-family:'Source Code Pro',monospace; }
+  .auth-user-bar { background:var(--blue-light); border-bottom:1px solid var(--blue-mid); padding:8px 32px; font-size:13px; font-family:'Source Code Pro',monospace; color:var(--blue-dark); display:flex; align-items:center; justify-content:space-between; }
+  .auth-user-bar.hidden { display:none; }
+  .auth-signout { background:var(--blue); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:700; font-family:'Merriweather Sans',sans-serif; padding:8px 18px; text-decoration:none; }
+
+  @media(max-width:640px) { .topnav,.main,.module-band { padding-left:18px; padding-right:18px; } .section-pills-wrap { padding-left:14px; } .tab-body { padding:22px 18px; } }
+</style>
+</head>
+<body>
+
+<!-- Auth overlay -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">☸️</div>
+    <div class="auth-title">EKS Skill Track</div>
+    <div class="auth-sub">Sign in with your SourceFuse account to access the track and save your progress.</div>
+    <button class="auth-google-btn" id="googleSignInBtn">
+      <svg viewBox="0 0 48 48"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="auth-divider">OR</div>
+    <input type="email" class="auth-input" id="authEmail" placeholder="you@sourcefuse.com" autocomplete="email">
+    <input type="password" class="auth-input" id="authPassword" placeholder="Password" autocomplete="current-password">
+    <button class="auth-email-btn" id="emailSignInBtn">Sign in with Email</button>
+    <div class="auth-error hidden" id="authError"></div>
+  </div>
+</div>
+
+<div class="auth-user-bar hidden" id="authUserBar">
+  <span id="authUserEmail"></span>
+  <button class="auth-signout" id="authSignOutBtn">Sign out</button>
+</div>
+
+<nav class="topnav">
+  <a href="eks-dashboard.html">Back to track dashboard</a>
+  <span class="sep">/</span>
+  <span>Module 1</span>
+  <span class="sep">/</span>
+  <span>EKS Cluster Foundations</span>
+</nav>
+
+<div class="module-band">
+  <div class="module-eyebrow">Module 1 of 5</div>
+  <div class="module-title">EKS Cluster Foundations</div>
+  <div class="module-progress" id="moduleProgress">0 of 4 sections complete</div>
+</div>
+
+<div class="refresh-wrap">
+  <button class="refresh-toggle" id="refreshToggle" onclick="toggleRefresh()">
+    <span class="rt-icon">💡</span>
+    <span class="rt-text">Do you want to refresh your knowledge of Kubernetes?
+      <span class="rt-sub">A quick primer on the core Kubernetes ideas EKS builds on — open it if the AWS-specific material feels fast-paced.</span>
+    </span>
+    <span class="rt-chev">▼ OPEN</span>
+  </button>
+
+  <div class="refresh-panel" id="refreshPanel">
+    <h3>Kubernetes — the fundamentals</h3>
+    <p><strong>Kubernetes</strong> is a system that runs your containerised applications across a pool of machines for you. You tell it the <strong>desired state</strong> ("run three copies of this container, always"), and Kubernetes continuously works to make reality match — restarting things that crash, replacing machines that die, and rescheduling work as needed.</p>
+    <div class="rf-eg">
+      <div class="eg-label">Analogy</div>
+      Think of Kubernetes as a <strong>restaurant manager</strong>. You don't tell the manager which cook stands at which station minute by minute — you say "I always want three cooks on the line." If one calls in sick, the manager pulls in another without you noticing. You declare the outcome; the manager maintains it.
+    </div>
+
+    <h3>The control plane vs. the nodes</h3>
+    <p>Every cluster has two halves. The <strong>control plane</strong> is the brain — it holds the desired state, makes scheduling decisions, and exposes the API you talk to. The <strong>worker nodes</strong> are the machines that actually run your containers.</p>
+    <ul>
+      <li><strong>Control plane</strong> — the API server (the front door you send commands to), the scheduler (decides which node runs what), and <strong>etcd</strong> (the database that stores the whole cluster's state).</li>
+      <li><strong>Worker nodes</strong> — each runs a <strong>kubelet</strong> (the on-node agent that talks to the control plane) and a container runtime that launches the actual containers.</li>
+    </ul>
+    <div class="rf-eg">
+      <div class="eg-label">Why this matters for EKS</div>
+      This split is the single most important idea for EKS. In EKS, <strong>AWS runs the control plane for you</strong> — the API server and etcd live in an AWS-managed account, patched and scaled by AWS. <strong>You own the worker nodes.</strong> Almost everything in this track lives on one side of that line or the other.
+    </div>
+
+    <h3>The objects you'll meet constantly</h3>
+    <h4>Pod</h4>
+    <p>The smallest unit Kubernetes runs — one or more containers that share a network address and lifecycle. You rarely create pods directly; something higher up manages them.</p>
+    <div class="rf-eg"><div class="eg-label">Example</div>A single web-server container running in a pod, reachable at its own internal IP inside the cluster.</div>
+    <h4>Deployment</h4>
+    <p>A controller that keeps a desired number of identical pods running, and handles rolling updates when you change the image.</p>
+    <div class="rf-eg"><div class="eg-label">Example</div>"Always keep 3 replicas of <code>web:v2</code> running." Kill a pod and the Deployment starts a replacement; push <code>web:v3</code> and it rolls pods over one at a time.</div>
+    <h4>Service</h4>
+    <p>A stable network endpoint in front of a set of pods. Pods come and go with changing IPs; the Service gives them one durable address and load-balances across them.</p>
+    <div class="rf-eg"><div class="eg-label">Example</div>Your frontend talks to <code>http://orders</code> (a Service) instead of chasing individual order-pod IPs that change every redeploy.</div>
+    <h4>Namespace</h4>
+    <p>A logical partition inside one cluster, used to separate teams or environments.</p>
+    <div class="rf-eg"><div class="eg-label">Example</div>A <code>staging</code> namespace and a <code>prod</code> namespace sharing one cluster but isolated from each other.</div>
+
+    <h3>RBAC — who can do what</h3>
+    <p>Kubernetes <strong>RBAC (Role-Based Access Control)</strong> governs which identities may perform which actions on which resources. A <strong>Role</strong> is a set of permissions; a <strong>RoleBinding</strong> grants that Role to a user, group, or service account.</p>
+    <div class="rf-eg">
+      <div class="eg-label">Why this matters for EKS</div>
+      EKS connects <strong>AWS IAM identities to Kubernetes RBAC</strong>. When you run a <code>kubectl</code> command, AWS authenticates <em>who you are</em> (IAM), then Kubernetes decides <em>what you're allowed to do</em> (RBAC). Module 1 covers exactly how that mapping is wired — so this RBAC concept is the hook the AWS layer hangs on.
+    </div>
+
+    <h3>How you talk to a cluster</h3>
+    <p><strong>kubectl</strong> is the command-line tool for Kubernetes. It reads a <strong>kubeconfig</strong> file that tells it which cluster to reach and how to authenticate. Commands are declarative: you usually apply a YAML manifest describing desired state rather than issuing step-by-step imperative orders.</p>
+    <div class="rf-eg"><div class="eg-label">Example</div><code>kubectl apply -f deployment.yaml</code> hands Kubernetes a description of what you want; the control plane figures out the steps to get there.</div>
+
+    <p class="rf-bridge">That's the whole foundation EKS builds on: a <strong>control plane</strong> holding desired state, <strong>worker nodes</strong> running your <strong>pods</strong>, <strong>Deployments</strong> keeping them alive, <strong>Services</strong> giving them stable addresses, and <strong>RBAC</strong> governing access. EKS keeps every one of these concepts unchanged — it simply runs the control plane <em>for</em> you and wires <strong>AWS IAM, networking, and scaling</strong> into the worker side. Everything ahead is "standard Kubernetes, plus the AWS layer." Keep the control-plane / node split in mind and Module 1 will click into place.</p>
+
+    <button class="refresh-close" onclick="toggleRefresh()">Close primer ▲</button>
+  </div>
+</div>
+
+<div class="section-pills-wrap">
+  <div class="section-pills" id="sectionPills">
+    <button class="section-pill active" data-sec="1" onclick="showSection(1)"><span class="pnum">1</span> Control plane &amp; responsibility</button>
+    <button class="section-pill" data-sec="2" onclick="showSection(2)"><span class="pnum">2</span> Provisioning the cluster</button>
+    <button class="section-pill" data-sec="3" onclick="showSection(3)"><span class="pnum">3</span> Authentication &amp; access</button>
+    <button class="section-pill" data-sec="4" onclick="showSection(4)"><span class="pnum">4</span> Versions &amp; upgrades</button>
+  </div>
+</div>
+
+<div class="main" id="sectionsRoot">
+  <!-- Sections injected by JS from SECTION_DATA -->
+</div>
+
+<div class="main" style="padding-top:0;">
+  <div class="bottom-nav">
+    <a class="nav-btn back" href="eks-dashboard.html">← Track dashboard</a>
+    <a class="nav-btn" href="eks-module-2.html">Module 2 — Compute: Node Groups &amp; Fargate →</a>
+  </div>
+</div>
+
+<footer>
+  EKS Skill Track · SourceFuse L&amp;D · <!-- TODO: skill-attainment tagline once naming convention is locked (e.g. "Completing this track attests EKS competency — not an internal certification.") -->
+  <span class="attrib">Best-practice guidance maps to the AWS Well-Architected Framework. Instructional scenarios and explanations are original content.</span>
+</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const _FB_CONFIG = {
+  apiKey: "AIzaSyC-I-IOCq2fCwa471fsD5xOn6SYQSBDp7Q",
+  authDomain: "sfcertification-grafana.firebaseapp.com",
+  projectId: "sfcertification-grafana",
+  storageBucket: "sfcertification-grafana.firebasestorage.app",
+  messagingSenderId: "227322696511",
+  appId: "1:227322696511:web:12e7ced7dd3d45fa06798a"
+};
+if (!window._fbApp) { window._fbApp = firebase.initializeApp(_FB_CONFIG); }
+const _auth = firebase.auth(window._fbApp);
+const _provider = new firebase.auth.GoogleAuthProvider();
+_provider.setCustomParameters({ hd: 'sourcefuse.com' });
+
+window.eksLearnerKey = function(sectionId) {
+  const uid = window._learnerUid || 'anon';
+  return 'eks_learner_' + uid + '_' + MODULE_ID + '_' + sectionId;
+};
+
+function showOverlay()   { document.getElementById('authOverlay')?.classList.remove('hidden'); }
+function hideOverlay()   { document.getElementById('authOverlay')?.classList.add('hidden'); }
+function showUserBar(email) {
+  const bar = document.getElementById('authUserBar');
+  const em  = document.getElementById('authUserEmail');
+  if (bar) bar.classList.remove('hidden');
+  if (em)  em.textContent = 'Welcome, ' + email;
+}
+
+_auth.onAuthStateChanged(function(user) {
+  if (user) {
+    const email = user.email || '';
+    if (!email.endsWith('@sourcefuse.com')) {
+      const errEl = document.getElementById('authError');
+      if (errEl) { errEl.textContent = 'Please use your @sourcefuse.com account.'; errEl.classList.remove('hidden'); }
+      _auth.signOut();
+      showOverlay();
+      return;
+    }
+    window._learnerUid   = user.uid;
+    window._learnerEmail = email;
+    hideOverlay();
+    showUserBar(email);
+    document.dispatchEvent(new Event('learnerReady'));
+  } else {
+    window._learnerUid   = null;
+    window._learnerEmail = null;
+    showOverlay();
+  }
+});
+
+document.getElementById('googleSignInBtn')?.addEventListener('click', function() {
+  _auth.signInWithPopup(_provider).catch(function(err) {
+    const el = document.getElementById('authError');
+    if (el) { el.textContent = err.message; el.classList.remove('hidden'); }
+  });
+});
+
+function eksEmailSignIn() {
+  const email = (document.getElementById('authEmail')?.value || '').trim().toLowerCase();
+  const pwd   =  document.getElementById('authPassword')?.value || '';
+  const el    =  document.getElementById('authError');
+  function fail(msg){ if(el){ el.textContent = msg; el.classList.remove('hidden'); } }
+  if (el) el.classList.add('hidden');
+  if (!email || !pwd) { fail('Please enter your email and password.'); return; }
+  if (!email.endsWith('@sourcefuse.com')) { fail('Only @sourcefuse.com accounts are allowed.'); return; }
+  _auth.signInWithEmailAndPassword(email, pwd).catch(function(err) {
+    const m = (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') ? 'Incorrect password.'
+            : (err.code === 'auth/user-not-found') ? 'No account found for this email.'
+            : err.message;
+    fail(m);
+  });
+}
+document.getElementById('emailSignInBtn')?.addEventListener('click', eksEmailSignIn);
+document.getElementById('authPassword')?.addEventListener('keydown', function(e){ if(e.key==='Enter') eksEmailSignIn(); });
+
+document.getElementById('authSignOutBtn')?.addEventListener('click', function() { _auth.signOut(); });
+</script>
+
+<!-- Question bank -->
+<script src="eks-question-bank.js"></script>
+
+<script>
+const CACHE_VERSION = '2026-06-10-v1';
+const MODULE_ID    = 'eks_m1';
+const CP_COURSE_ID = 'eksSkillTrack2026';      /* TODO: confirm final course id when naming convention is locked */
+const CP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
+const BANK_KEY     = 'm1';   // key into window.EKS_QUESTION_BANK
+
+console.log('%c[EKS Skill Track] eks-module-1.html — v' + CACHE_VERSION, 'color:#1a6eb5;font-weight:bold;');
+
+// ── Five tabs per section ──────────────────────────────────────────────
+//   1 Scenario (Set) · 2 Walkthrough (Learn) · 3 Best Practices (See)
+//   4 Lab (Do) · 5 Check Your Understanding (Self-Assess)
+const TAB_DEFS = [
+  { key:'scenario',  name:'Scenario',              verb:'Set' },
+  { key:'walkthrough', name:'Walkthrough',         verb:'Learn' },
+  { key:'best',      name:'Best Practices',        verb:'See' },
+  { key:'lab',       name:'Lab',                   verb:'Do' }
+  // 5th tab (Check Your Understanding / Self-Assess) is appended in code.
+];
+
+// ── Section teaching content ────────────────────────────────────────────────
+const SECTION_DATA = [
+  {
+    id: 's1', title: 'Control plane & responsibility',
+    scenario: {
+      heading: 'A new cluster, an unclear boundary',
+      html: `
+        <p class="prose"><strong>Rohan</strong>, a DevOps Engineer at an SF client, has just been handed ownership of the team's first Amazon EKS cluster. Coming from self-managed Kubernetes on EC2, his instinct is to start planning etcd backups, control-plane patching windows, and API-server failover — exactly the work that consumed his weekends on the old cluster.</p>
+        <p class="prose">His DevOps Lead stops him: "On EKS, you don't run the control plane at all. Spend that energy on the nodes and the workloads." Rohan isn't sure where AWS's responsibility ends and his begins — and getting that line wrong means either duplicated effort or a dangerous gap nobody owns.</p>
+        <div class="callout"><strong>Why this matters from day one:</strong> the single most consequential mental model in EKS is the <em>shared-responsibility split</em>. Misplace it and you'll either waste effort hardening things AWS already manages, or neglect node-level patching and access control that are squarely yours.</div>`
+    },
+    walkthrough: {
+      heading: 'What AWS runs, and what you run',
+      html: `
+        <p class="prose">An EKS cluster has the same two halves as any Kubernetes cluster — but the ownership line is drawn by AWS, not by you.</p>
+        <p class="prose"><strong>The control plane is fully managed by AWS.</strong> The API server, scheduler, and <code>etcd</code> run in an AWS-owned account, across multiple Availability Zones, patched and scaled by AWS. You never SSH into it, back up etcd, or schedule its upgrades at the infrastructure level. You interact with it only through the Kubernetes API endpoint AWS exposes for your cluster.</p>
+        <p class="prose"><strong>The data plane is yours.</strong> Worker nodes — whether EC2 instances you manage, managed node groups, or Fargate — run your pods, and their patching, scaling, sizing, and security posture are your responsibility. So are the Kubernetes objects you deploy and the access rules that govern them.</p>
+        <div class="example-block">
+          <div class="ex-label">The line, concretely</div>
+          <strong>AWS owns:</strong> API server availability, etcd durability and backups, control-plane patching, control-plane scaling.<br><br>
+          <strong>You own:</strong> node OS patching and AMI choice, node scaling and capacity, workload manifests, IAM-to-RBAC access mapping, network policy, and which version you upgrade to and when.
+        </div>
+        <p class="prose">The cluster's API endpoint is the seam between the two. By default it can be public, private, or both — and locking it down is one of your earliest responsibilities, which the Best Practices tab addresses.</p>
+        <div class="callout callout-good"><strong>The reframe for Rohan:</strong> every hour he'd have spent on etcd backups is now AWS's problem. His job is the node fleet, the access model, and the upgrade cadence — the data-plane side of the line.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Operational Excellence','Security','Reliability'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Lean on the managed control plane — don't rebuild it</div>
+          <div class="bp-body">Treat the control plane as undifferentiated heavy lifting that AWS has taken on. Don't replicate etcd backups or control-plane monitoring that AWS already provides; invest that effort in your workloads and node fleet instead. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Restrict the cluster API endpoint</div>
+          <div class="bp-body">Avoid leaving the API server endpoint open to <code>0.0.0.0/0</code>. Enable the <strong>private endpoint</strong> for in-VPC access and either disable the public endpoint or restrict it to known CIDR ranges. Pair this with least-privilege access (Section 3). <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Rely on the multi-AZ control plane, and design nodes to match</div>
+          <div class="bp-body">AWS runs the control plane across multiple Availability Zones for you. Earn the same resilience on your side by spreading worker nodes across AZs so a single-AZ failure doesn't take out your data plane. <span class="wa-pillar">Reliability</span></div>
+        </div>
+        <div class="callout"><strong>Reading the tags:</strong> each practice above is labelled with the Well-Architected pillar it most directly serves. You'll be asked to make these mappings yourself in the assessment — both "which pillar does this address?" and "what's the Well-Architected-aligned fix?"</div>`
+    },
+    lab: {
+      heading: 'Lab — inspect the managed control plane',
+      intro: `<p class="prose">In your own AWS sandbox, you'll create a minimal cluster and observe the responsibility split first-hand: you can reach the control plane, but you cannot see the machines running it. Roughly 15–20 minutes, most of it waiting for the cluster to come up.</p>`,
+      steps: [
+        { t:'Prerequisites', p:'Confirm your tooling is present and pointed at your sandbox account.',
+          code:`# Verify the AWS CLI is authenticated to YOUR sandbox account\naws sts get-caller-identity\n\n# Confirm eksctl and kubectl are installed\neksctl version\nkubectl version --client` },
+        { t:'Create a minimal cluster', p:'eksctl provisions the VPC, IAM roles, and control plane for you. This step takes ~15 minutes — that wait is AWS building the managed control plane on your behalf.',
+          code:`eksctl create cluster \\\n  --name sf-eks-lab \\\n  --region ap-south-1 \\\n  --nodes 2 \\\n  --node-type t3.medium \\\n  --managed` },
+        { t:'Reach the control plane', p:'kubectl talks to the AWS-managed API server. You get answers — but notice you are never given an etcd host or a control-plane node to log into.',
+          code:`# eksctl already wrote your kubeconfig; confirm you can reach the API server\nkubectl get svc\n\n# List the control-plane-managed core components\nkubectl get pods -n kube-system` },
+        { t:'See only YOUR side of the line', p:'The nodes you list are the worker nodes you own. The control-plane machines are invisible — they live in the AWS-managed account.',
+          code:`# These are YOUR worker nodes (the data plane)\nkubectl get nodes -o wide\n\n# Describe the cluster: note the managed endpoint and platform version\naws eks describe-cluster --name sf-eks-lab \\\n  --query 'cluster.{endpoint:endpoint,version:version,status:status}'` }
+      ],
+      cleanup: `eksctl delete cluster --name sf-eks-lab --region ap-south-1`
+    }
+  },
+
+  {
+    id: 's2', title: 'Provisioning the cluster',
+    scenario: {
+      heading: 'Two ways to stand up a cluster',
+      html: `
+        <p class="prose"><strong>Meera</strong>, a DevOps Architect, needs every environment — dev, staging, prod — to come up identically and be reproducible after a disaster. A teammate stood up the current dev cluster by clicking through the console and running ad-hoc CLI commands, and now nobody can say exactly how it was configured.</p>
+        <p class="prose">Meera has to choose how the team will provision clusters going forward. <strong>eksctl</strong> is fast and purpose-built for EKS; <strong>Terraform</strong> fits the team's existing infrastructure-as-code estate. Both beat clicking — but she needs to understand what each actually does before standardising on one.</p>
+        <div class="callout"><strong>Why this matters:</strong> how a cluster is provisioned determines whether it can be audited, reviewed, and recreated. A console-built cluster is a liability the moment the person who built it is unavailable.</div>`
+    },
+    walkthrough: {
+      heading: 'eksctl and Terraform, and what they create',
+      html: `
+        <p class="prose">A cluster is never just the control plane — it needs a VPC, subnets across AZs, IAM roles, security groups, and node groups. The difference between the provisioning options is how much of that supporting cast they create for you, and how reproducibly.</p>
+        <p class="prose"><strong>eksctl</strong> is the official CLI for EKS. A single command creates the cluster <em>and</em> its supporting VPC, subnets, IAM roles, and node groups, orchestrated underneath as AWS CloudFormation stacks. It's the fastest path to a working cluster and is itself driven by a YAML config file you can commit to version control.</p>
+        <p class="prose"><strong>Terraform</strong> describes the cluster and all its dependencies as declarative code in the same tool you likely already use for the rest of your AWS estate. It's more verbose than eksctl but gives you one consistent IaC workflow, a plan/apply review step, and state you can track.</p>
+        <div class="example-block">
+          <div class="ex-label">The contrast that matters</div>
+          The raw <code>aws eks create-cluster</code> API call creates <em>only</em> the control plane — you're then on the hook to wire up the VPC, roles, and nodes yourself. eksctl and Terraform both create that whole supporting environment for you. The choice between them is workflow and consistency, not capability.
+        </div>
+        <p class="prose">For Meera, the deciding factor isn't speed — it's that <strong>whatever she picks must be committed to version control</strong>, so any environment can be reviewed in a pull request and rebuilt from scratch.</p>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Operational Excellence','Reliability'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Define clusters as code, in version control</div>
+          <div class="bp-body">Whether eksctl config or Terraform, the cluster definition belongs in a repo — reviewed via pull request, not assembled by hand in the console. Provisioning becomes repeatable and auditable. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Make environments reproducible</div>
+          <div class="bp-body">A version-controlled definition means a destroyed or corrupted cluster can be recreated from a known-good state, and dev/staging/prod can be kept genuinely identical. <span class="wa-pillar">Reliability</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Pick one workflow and standardise</div>
+          <div class="bp-body">Mixing console clicks, ad-hoc CLI, eksctl, and Terraform across environments breeds drift. Choose the tool that fits your estate (Terraform if you're already IaC-heavy; eksctl for speed and EKS-specific simplicity) and apply it consistently. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Meera is replacing:</strong> a cluster built by console clicks with no record of its configuration. It can't be reviewed, can't be reliably reproduced, and becomes a single point of tribal knowledge.</div>`
+    },
+    lab: {
+      heading: 'Lab — provision from a committed config',
+      intro: `<p class="prose">You'll define a cluster declaratively in an eksctl config file (the same principle as Terraform, fewer moving parts for a first pass), create it from that file, then confirm the file alone is enough to describe the environment. ~15–20 minutes including cluster creation.</p>`,
+      steps: [
+        { t:'Write the cluster as a config file', p:'Save this as cluster.yaml. This file is the artifact you would commit to version control — it fully describes the cluster.',
+          code:`<span class="cmt"># cluster.yaml</span>\napiVersion: eksctl.io/v1alpha5\nkind: ClusterConfig\nmetadata:\n  name: sf-eks-iac\n  region: ap-south-1\n  version: "1.30"\nmanagedNodeGroups:\n  - name: ng-default\n    instanceType: t3.medium\n    desiredCapacity: 2` },
+        { t:'Create from the file', p:'Provision the entire cluster from the committed definition — no console clicks, no ad-hoc flags.',
+          code:`eksctl create cluster -f cluster.yaml` },
+        { t:'Confirm reproducibility', p:'Everything about the cluster traces back to the file. Inspect the CloudFormation stacks eksctl created to see the supporting VPC and IAM it built for you.',
+          code:`# The cluster matches the file\neksctl get cluster --name sf-eks-iac --region ap-south-1\n\n# The supporting infra eksctl created on your behalf\naws cloudformation list-stacks \\\n  --query "StackSummaries[?contains(StackName,'sf-eks-iac')].StackName" \\\n  --stack-status-filter CREATE_COMPLETE` },
+        { t:'Prove the IaC point', p:'Commit the file. Anyone on the team can now recreate this exact environment, or review a change to it in a pull request.',
+          code:`git add cluster.yaml\ngit commit -m "Add sf-eks-iac cluster definition"` }
+      ],
+      cleanup: `eksctl delete cluster -f cluster.yaml`
+    }
+  },
+
+  {
+    id: 's3', title: 'Authentication & access',
+    scenario: {
+      heading: 'One shared role, full admin, every cluster',
+      html: `
+        <p class="prose"><strong>The team</strong> has been getting into every cluster through a single shared IAM role that carries <code>cluster-admin</code> everywhere. It was convenient early on. Now there are five clusters, twelve engineers, and an auditor asking who can do what — and the honest answer is "everyone can do everything."</p>
+        <p class="prose"><strong>Priya</strong>, the DevOps Lead, has to untangle this. She needs to understand how an AWS IAM identity even becomes a Kubernetes identity in EKS, and then how to grant each person only the access they actually need.</p>
+        <div class="callout"><strong>Why this matters:</strong> in EKS, authentication (who you are) is AWS IAM, and authorization (what you can do) is Kubernetes RBAC. Getting the mapping between them wrong is how a whole team ends up with standing admin on production.</div>`
+    },
+    walkthrough: {
+      heading: 'How IAM identities become cluster access',
+      html: `
+        <p class="prose">When you run a <code>kubectl</code> command against EKS, two distinct checks happen in sequence. First, <strong>AWS IAM authenticates you</strong> — it confirms which IAM principal (user or role) you are. Then <strong>Kubernetes RBAC authorizes you</strong> — it decides what that identity is permitted to do inside the cluster. EKS is the bridge that maps the first to the second.</p>
+        <p class="prose"><strong>The cluster creator is special.</strong> Whichever IAM principal creates the cluster is automatically granted <code>cluster-admin</code> in Kubernetes RBAC. Everyone else must be explicitly granted access — which is exactly the mapping you have to manage.</p>
+        <p class="prose">Historically that mapping lived in the <strong><code>aws-auth</code> ConfigMap</strong> — a single hand-edited YAML object where one typo could lock everyone out. EKS now offers <strong>access entries</strong>: a first-class, API-driven, auditable way to associate an IAM principal with a Kubernetes access scope, without editing fragile shared YAML.</p>
+        <div class="example-block">
+          <div class="ex-label">The two layers, concretely</div>
+          <strong>IAM (authentication):</strong> "This request comes from <code>arn:aws:iam::...:role/devops-engineer</code> — a valid principal."<br><br>
+          <strong>RBAC (authorization):</strong> "That principal is mapped to a role that can read pods in the <code>staging</code> namespace, and nothing in <code>prod</code>." Access entries are how you declare that mapping cleanly.
+        </div>
+        <p class="prose">For Priya, the fix has a clear shape: replace the one shared admin role with <strong>distinct IAM principals mapped to least-privilege RBAC roles</strong>, granting <code>cluster-admin</code> only where it's genuinely required.</p>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Security','Operational Excellence'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Map distinct identities to least-privilege roles</div>
+          <div class="bp-body">Give each engineer (or each CI system) its own IAM principal mapped to the narrowest Kubernetes RBAC role that lets them do their job. Reserve <code>cluster-admin</code> for the few who truly need it. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Prefer access entries over the aws-auth ConfigMap</div>
+          <div class="bp-body">Use EKS access entries to manage cluster access through the AWS API — auditable, less error-prone, and free of the shared-YAML failure mode where a single bad edit locks everyone out. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Never share a single admin identity across a team</div>
+          <div class="bp-body">A shared role makes it impossible to attribute actions to a person and guarantees over-provisioned access. Individual principals make access both least-privilege and auditable. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Priya is dismantling:</strong> one shared role with cluster-admin on every cluster — convenient, unauditable, and the opposite of least privilege.</div>`
+    },
+    lab: {
+      heading: 'Lab — inspect and scope cluster access',
+      intro: `<p class="prose">You'll examine who currently has access to your lab cluster, then grant a second identity a least-privilege, read-only scope using an access entry — the clean alternative to hand-editing aws-auth. ~10 minutes (uses the cluster from earlier sections).</p>`,
+      steps: [
+        { t:'See who you are to AWS', p:'This is the IAM principal Kubernetes will authenticate. If you created the cluster, this principal holds cluster-admin.',
+          code:`aws sts get-caller-identity` },
+        { t:'List existing access entries', p:'See which IAM principals are currently mapped into the cluster.',
+          code:`aws eks list-access-entries --cluster-name sf-eks-lab --region ap-south-1` },
+        { t:'Grant a least-privilege, read-only entry', p:'Map a second IAM role (replace the ARN with one from your sandbox) and associate a read-only policy scoped to a single namespace — not cluster-admin.',
+          code:`<span class="cmt"># Create the access entry for the principal</span>\naws eks create-access-entry \\\n  --cluster-name sf-eks-lab --region ap-south-1 \\\n  --principal-arn arn:aws:iam::&lt;ACCOUNT_ID&gt;:role/&lt;READONLY_ROLE&gt;\n\n<span class="cmt"># Associate a read-only access policy, scoped to one namespace</span>\naws eks associate-access-policy \\\n  --cluster-name sf-eks-lab --region ap-south-1 \\\n  --principal-arn arn:aws:iam::&lt;ACCOUNT_ID&gt;:role/&lt;READONLY_ROLE&gt; \\\n  --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy \\\n  --access-scope type=namespace,namespaces=staging` },
+        { t:'Confirm the scope', p:'Verify the entry exists and carries only the view policy you attached — least privilege, declared via the API rather than edited into shared YAML.',
+          code:`aws eks list-associated-access-policies \\\n  --cluster-name sf-eks-lab --region ap-south-1 \\\n  --principal-arn arn:aws:iam::&lt;ACCOUNT_ID&gt;:role/&lt;READONLY_ROLE&gt;` }
+      ],
+      cleanup: `# Remove the access entry you created (the cluster itself can stay for later sections)\naws eks delete-access-entry \\\n  --cluster-name sf-eks-lab --region ap-south-1 \\\n  --principal-arn arn:aws:iam::&lt;ACCOUNT_ID&gt;:role/&lt;READONLY_ROLE&gt;`
+    }
+  },
+
+  {
+    id: 's4', title: 'Versions & upgrades',
+    scenario: {
+      heading: 'Three versions behind, support running out',
+      html: `
+        <p class="prose"><strong>Arjun</strong>, a DevOps Engineer, inherits a cluster that hasn't been touched in over a year. It's several Kubernetes minor versions behind, and AWS is sending notices that its version is nearing the end of <strong>standard support</strong> — after which the cluster keeps running but incurs a higher per-hour charge under <strong>extended support</strong>.</p>
+        <p class="prose">The previous owner avoided upgrades because they felt risky. Arjun has to both fix the immediate problem and establish a cadence so the cluster never drifts this far again — without taking down the workloads running on it.</p>
+        <div class="callout"><strong>Why this matters:</strong> EKS versions have a support lifecycle. Neglecting upgrades doesn't just accumulate security and feature debt — it eventually costs real money, and rushing a multi-version jump under pressure is exactly how upgrades break things.</div>`
+    },
+    walkthrough: {
+      heading: 'The upgrade order, and why cadence beats heroics',
+      html: `
+        <p class="prose">Upgrading an EKS cluster is not a single button — it's an ordered sequence, and the order exists to keep the cluster healthy throughout.</p>
+        <p class="prose"><strong>Control plane first.</strong> You upgrade the managed control plane one minor version at a time — you can't skip versions. AWS performs the actual upgrade; you choose when.</p>
+        <p class="prose"><strong>Add-ons next.</strong> Core components like CoreDNS, kube-proxy, and the VPC CNI have versions tied to the Kubernetes version and should be updated to stay compatible with the newly upgraded control plane.</p>
+        <p class="prose"><strong>Worker nodes last.</strong> You roll your node groups up to match. A key constraint: <strong>nodes must never run more than one minor version behind the control plane</strong>, so you can't let the data plane lag far behind after a control-plane bump.</p>
+        <div class="example-block">
+          <div class="ex-label">Why one version at a time</div>
+          You cannot jump from 1.27 straight to 1.30. Each minor version may change APIs and deprecate fields; stepping through them one at a time — ideally validated in a non-prod cluster first — surfaces breakage in a controlled place rather than in production during a panicked end-of-support scramble.
+        </div>
+        <p class="prose">For Arjun, the lesson is that the expensive, risky position he inherited is a <em>process</em> failure, not a technical one. The fix is a <strong>regular, tested upgrade cadence</strong> — small, frequent, rehearsed steps that keep the cluster comfortably inside standard support.</p>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Operational Excellence','Cost Optimization','Security'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Upgrade on a regular, tested cadence</div>
+          <div class="bp-body">Move one minor version at a time, validate in a non-prod cluster first, then apply to production — control plane, then add-ons, then nodes. Frequent small upgrades are far safer than rare large ones. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Stay within standard support</div>
+          <div class="bp-body">Letting a cluster fall onto extended support means paying a higher per-hour cluster charge for a version you could have upgraded for free. A cadence that keeps you in standard support avoids that cost entirely. <span class="wa-pillar">Cost Optimization</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Don't accumulate version debt</div>
+          <div class="bp-body">Old versions miss security patches and CVE fixes delivered in newer Kubernetes releases. Staying current is part of your security posture, not just housekeeping. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Arjun inherited:</strong> avoiding upgrades because they "feel risky," until the cluster is several versions behind and bleeding money on extended support — at which point the upgrade is genuinely risky.</div>`
+    },
+    lab: {
+      heading: 'Lab — read the version lifecycle and plan an upgrade',
+      intro: `<p class="prose">A read-mostly lab: you'll inspect your cluster's version and the version skew between control plane and nodes, then see the (non-destructive) commands that drive a one-step upgrade. ~10 minutes. You won't trigger a production-style upgrade here — only inspect and dry-run the plan.</p>`,
+      steps: [
+        { t:'Check the current version and support status', p:'See what version your cluster runs and how it sits in the support lifecycle.',
+          code:`aws eks describe-cluster --name sf-eks-lab --region ap-south-1 \\\n  --query 'cluster.{version:version,status:status,platformVersion:platformVersion}'` },
+        { t:'Inspect control-plane vs node skew', p:'Compare the server version to the version reported by your nodes. They must stay within one minor version of each other.',
+          code:`# Control plane (server) version vs nodes\nkubectl version\nkubectl get nodes` },
+        { t:'See the add-ons that upgrade alongside', p:'These managed add-ons track the Kubernetes version and are upgraded after the control plane.',
+          code:`aws eks list-addons --cluster-name sf-eks-lab --region ap-south-1` },
+        { t:'Review the one-step upgrade plan (do not run in shared envs)', p:'This is the ordering you would follow for a real upgrade — control plane first, then nodes. Shown for understanding; run only in your disposable sandbox if at all.',
+          code:`<span class="cmt"># 1) Control plane — one minor version up</span>\n<span class="cmt"># eksctl upgrade cluster --name sf-eks-lab --version 1.31 --approve</span>\n\n<span class="cmt"># 2) Then add-ons, 3) then node group:</span>\n<span class="cmt"># eksctl upgrade nodegroup --cluster sf-eks-lab --name ng-default --kubernetes-version 1.31</span>` }
+      ],
+      cleanup: `# If this is your last section, tear down the cluster from Section 1:\neksctl delete cluster --name sf-eks-lab --region ap-south-1`
+    }
+  }
+];
+
+// ── Build section panels from data + question bank ───────────────────────────
+function bankFor(sectionKey) {
+  try { return (window.EKS_QUESTION_BANK[BANK_KEY] || {})[sectionKey] || []; }
+  catch(e) { return []; }
+}
+
+function buildSections() {
+  const root = document.getElementById('sectionsRoot');
+  SECTION_DATA.forEach(function(sec, idx) {
+    const secNum = idx + 1;
+    const questions = bankFor(sec.id);
+    const panel = document.createElement('section');
+    panel.className = 'section-panel' + (secNum === 1 ? ' active' : '');
+    panel.id = 'section-' + secNum;
+
+    // Tab buttons (4 teaching + 1 self-assess), each with verb-caption
+    let tabsBtns = '';
+    TAB_DEFS.forEach(function(t, ti) {
+      tabsBtns += '<button class="tab-btn' + (ti===0?' active':'') + '" onclick="showTab(' + secNum + ',' + (ti+1) + ')">'
+        + '<span class="num">' + (ti+1) + '</span>'
+        + '<span class="tab-caption-wrap"><span class="tab-name">' + t.name + '</span><span class="tab-verb">' + t.verb + '</span></span>'
+        + '</button>';
+    });
+    tabsBtns += '<button class="tab-btn" onclick="showTab(' + secNum + ',5)">'
+      + '<span class="num">5</span>'
+      + '<span class="tab-caption-wrap"><span class="tab-name">Check Your Understanding</span><span class="tab-verb">Self-Assess</span></span>'
+      + '</button>';
+
+    // Teaching panes
+    let panes = '';
+
+    // 1 — Scenario
+    panes += buildPane(secNum, 1, 'Scenario · Set', sec.scenario.heading, sec.scenario.html, 2);
+    // 2 — Walkthrough
+    panes += buildPane(secNum, 2, 'Walkthrough · Learn', sec.walkthrough.heading, sec.walkthrough.html, 3);
+    // 3 — Best Practices (with pillar legend)
+    let bestIntro = '';
+    if (sec.best.pillars && sec.best.pillars.length) {
+      bestIntro = '<div class="wa-legend">Well-Architected pillars in play: ' + sec.best.pillars.join(' · ') + '</div>';
+    }
+    panes += buildPane(secNum, 3, 'Best Practices · See', sec.best.heading, bestIntro + sec.best.html, 4);
+    // 4 — Lab
+    let labHtml = sec.lab.intro || '';
+    labHtml += '<div class="lab-caveat"><strong>⚠ Run in your own AWS sandbox only.</strong> These steps create real, billable AWS resources (EKS clusters, EC2 nodes, load balancers). Use a personal/sandbox account, follow the cleanup step at the end, and never run them against shared or production infrastructure.</div>';
+    sec.lab.steps.forEach(function(st, si) {
+      labHtml += '<div class="lab-step">'
+        + '<div class="lab-step-head"><span class="ls-num">' + (si+1) + '</span>' + st.t + '</div>'
+        + (st.p ? '<p>' + st.p + '</p>' : '')
+        + '<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>' + st.code + '</code></div>'
+        + '</div>';
+    });
+    if (sec.lab.cleanup) {
+      labHtml += '<div class="lab-cleanup"><strong>🧹 Clean up to avoid charges:</strong> when you\'re done, remove what you created.'
+        + '<div class="code-block" style="margin-top:10px;"><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>' + sec.lab.cleanup + '</code></div></div>';
+    }
+    panes += buildPane(secNum, 4, 'Lab · Do', sec.lab.heading, labHtml, 5);
+
+    // 5 — Check Your Understanding (quiz)
+    let qHtml = '';
+    questions.forEach(function(q, qi) {
+      let opts = '';
+      q.options.forEach(function(opt, oi) {
+        opts += '<label class="option"><input type="radio" name="s' + secNum + '_q' + (qi+1) + '" value="' + oi + '"> ' + opt + '</label>';
+      });
+      qHtml += '<div class="question-block">'
+        + '<div class="q-num">Question ' + (qi+1) + ' of ' + questions.length + '</div>'
+        + '<div class="q-text">' + q.q + '</div>'
+        + '<div class="options">' + opts + '</div>'
+        + '</div>';
+    });
+
+    panes += '<div class="tab-pane" id="pane-' + secNum + '-5">'
+      + '<div class="tab-label">Check Your Understanding · Self-Assess</div>'
+      + '<div class="tab-heading">Check your understanding</div>'
+      + '<div class="questions-wrap" id="questionsWrap-' + secNum + '">'
+      + '<p class="assessment-sub">Answer all ' + questions.length + ' questions to complete this section. Questions draw on all four tabs — including the Best Practices / Well-Architected mappings. Your answers are saved.</p>'
+      + qHtml
+      + '<button class="submit-btn" id="submitBtn-' + secNum + '" disabled>Submit answers</button>'
+      + '<div class="submit-note" id="submitNote-' + secNum + '">Select an answer for each question to submit.</div>'
+      + '</div>'
+      + '<div class="submitted-wrap hidden" id="submittedWrap-' + secNum + '">'
+      + '<div class="submitted-icon">✓</div><div class="submitted-title">Section complete</div>'
+      + '<div class="submitted-body">Your answers have been recorded and this section is marked complete.</div>'
+      + '<button class="ghost-btn redo-btn" id="redoBtn-' + secNum + '" style="margin-top:14px;">&#x21BA; Redo section</button>'
+      + '</div>'
+      + '</div>';
+
+    panel.innerHTML = '<div class="tabs-wrap"><div class="tabs">' + tabsBtns + '</div></div>'
+      + '<div class="tab-body">' + panes + '</div>';
+    root.appendChild(panel);
+  });
+}
+
+function buildPane(secNum, tabNum, label, heading, html, nextTab) {
+  const nav = '<div class="divider"></div><div class="tab-nav-row"><span></span>'
+    + '<button class="continue-btn" onclick="showTab(' + secNum + ',' + nextTab + ')">Continue →</button></div>';
+  return '<div class="tab-pane' + (tabNum===1?' active':'') + '" id="pane-' + secNum + '-' + tabNum + '">'
+    + '<div class="tab-label">' + label + '</div>'
+    + '<div class="tab-heading">' + heading + '</div>'
+    + html + nav + '</div>';
+}
+
+// ── Copy-to-clipboard for lab code blocks ────────────────────────────────────
+function copyCode(btn) {
+  const code = btn.parentElement.querySelector('code');
+  const text = code ? code.innerText : '';
+  navigator.clipboard.writeText(text).then(function(){
+    const orig = btn.textContent; btn.textContent = 'COPIED';
+    setTimeout(function(){ btn.textContent = orig; }, 1400);
+  }).catch(function(){ /* clipboard unavailable; no-op */ });
+}
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function toggleRefresh() {
+  var t = document.getElementById('refreshToggle');
+  var p = document.getElementById('refreshPanel');
+  if (!t || !p) return;
+  var open = p.classList.toggle('open');
+  t.classList.toggle('open', open);
+  var chev = t.querySelector('.rt-chev');
+  if (chev) chev.textContent = open ? '▲ CLOSE' : '▼ OPEN';
+}
+
+function showSection(n) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.section-pill').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + n)?.classList.add('active');
+  document.querySelector('.section-pill[data-sec="' + n + '"]')?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function showTab(sec, t) {
+  const panel = document.getElementById('section-' + sec);
+  if (!panel) return;
+  panel.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  panel.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  panel.querySelector('#pane-' + sec + '-' + t)?.classList.add('active');
+  panel.querySelectorAll('.tab-btn')[t-1]?.classList.add('active');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+function loadSec(secNum) {
+  const k = window.eksLearnerKey('s' + secNum);
+  try { return JSON.parse(localStorage.getItem(k)) || {}; } catch(e) { return {}; }
+}
+function saveSec(secNum, s) {
+  const k = window.eksLearnerKey('s' + secNum);
+  localStorage.setItem(k, JSON.stringify(s));
+}
+function allSectionsDone() {
+  for (let i = 1; i <= SECTION_DATA.length; i++) {
+    if (!loadSec(i).complete) return false;
+  }
+  return true;
+}
+function updateModuleProgress() {
+  let done = 0;
+  for (let i = 1; i <= SECTION_DATA.length; i++) {
+    if (loadSec(i).complete) {
+      done++;
+      document.querySelector('.section-pill[data-sec="' + i + '"]')?.classList.add('done');
+    }
+  }
+  const el = document.getElementById('moduleProgress');
+  if (el) el.textContent = done + ' of ' + SECTION_DATA.length + ' sections complete';
+  if (done >= SECTION_DATA.length) cpWriteModuleComplete();
+}
+
+function wireSection(secNum) {
+  const questions = bankFor('s' + secNum);
+  const qCount = questions.length;
+  const submitBtn = document.getElementById('submitBtn-' + secNum);
+  const note = document.getElementById('submitNote-' + secNum);
+
+  function checkAll() {
+    let answered = 0;
+    for (let i = 1; i <= qCount; i++) {
+      if (document.querySelector('input[name="s' + secNum + '_q' + i + '"]:checked')) answered++;
+    }
+    const all = answered === qCount;
+    if (submitBtn) submitBtn.disabled = !all;
+    if (note) note.textContent = all ? 'Ready to submit.' : 'Select an answer for each question to submit.';
+  }
+
+  document.querySelectorAll('#questionsWrap-' + secNum + ' input[type="radio"]').forEach(function(r) {
+    r.addEventListener('change', checkAll);
+  });
+
+  function showSubmitted() {
+    document.getElementById('questionsWrap-' + secNum)?.classList.add('hidden');
+    document.getElementById('submittedWrap-' + secNum)?.classList.remove('hidden');
+  }
+
+  if (submitBtn) submitBtn.addEventListener('click', function() {
+    const answers = {};
+    for (let i = 1; i <= qCount; i++) {
+      const v = document.querySelector('input[name="s' + secNum + '_q' + i + '"]:checked')?.value;
+      answers['q' + i] = v != null ? parseInt(v, 10) : null;
+    }
+    const correct = {};
+    questions.forEach(function(q, qi) { correct['q' + (qi+1)] = q.correctIndex; });
+    let score = 0;
+    for (let i = 1; i <= qCount; i++) { if (answers['q'+i] === correct['q'+i]) score++; }
+
+    const s = loadSec(secNum);
+    s.sectionId   = 's' + secNum;
+    s.answers     = answers;
+    s.correct     = correct;
+    s.score       = score;
+    s.total       = qCount;
+    s.submittedAt = new Date().toISOString();
+    s.complete    = true;
+    saveSec(secNum, s);
+
+    showSubmitted();
+    document.querySelector('.section-pill[data-sec="' + secNum + '"]')?.classList.add('done');
+    updateModuleProgress();
+  });
+
+  const redo = document.getElementById('redoBtn-' + secNum);
+  if (redo) redo.addEventListener('click', function() {
+    const k = window.eksLearnerKey('s' + secNum);
+    localStorage.removeItem(k);
+    document.getElementById('questionsWrap-' + secNum)?.classList.remove('hidden');
+    document.getElementById('submittedWrap-' + secNum)?.classList.add('hidden');
+    document.querySelectorAll('#questionsWrap-' + secNum + ' input[type="radio"]').forEach(function(r){ r.checked = false; });
+    if (submitBtn) submitBtn.disabled = true;
+    if (note) note.textContent = 'Select an answer for each question to submit.';
+    document.querySelector('.section-pill[data-sec="' + secNum + '"]')?.classList.remove('done');
+    updateModuleProgress();
+  });
+
+  // Restore submitted state
+  if (loadSec(secNum).submittedAt) showSubmitted();
+}
+
+document.addEventListener('learnerReady', function() {
+  cpEnsureModuleStarted();
+  for (let i = 1; i <= SECTION_DATA.length; i++) wireSection(i);
+  updateModuleProgress();
+});
+
+// ── courseProgress (uid-keyed; module map) ───────────────────────────────────
+function cpNow() {
+  var d = new Date(); var pad = function(n){ return String(n).padStart(2,'0'); };
+  return { date: d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),
+           time: pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()), ms: d.getTime() };
+}
+function cpFmtDuration(ms) {
+  if (ms == null || ms < 0) return null;
+  var s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  if (h > 0) return h+'h '+m+'m '+sec+'s';
+  if (m > 0) return m+'m '+sec+'s';
+  return sec+'s';
+}
+function cpDb() { return firebase.firestore(window._fbApp); }
+function cpDocRef() { return cpDb().collection('courseProgress').doc(window._learnerUid); }
+function cpReady() { return window._fbApp && window._learnerUid && window._learnerUid !== 'anon'; }
+
+function cpEnsureModuleStarted() {
+  if (!cpReady()) return;
+  var ref = cpDocRef();
+  ref.get().then(function(snap){
+    var data = snap.exists ? (snap.data() || {}) : {};
+    var course = (data.courses && data.courses[CP_COURSE_ID]) || {};
+    var mods = course.modules || {};
+    var t = cpNow();
+    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, courses: {} };
+    update.courses[CP_COURSE_ID] = { moduleInProgress: MODULE_ID, modules: {} };
+    if (!course.courseStartedOn) { update.courses[CP_COURSE_ID].courseStartedOn = t.date; update.courses[CP_COURSE_ID].courseStartedAt = t.time; }
+    if (!mods[MODULE_ID] || !mods[MODULE_ID].startedOn) {
+      update.courses[CP_COURSE_ID].modules[MODULE_ID] = { startedOn: t.date, startedAt: t.time };
+    }
+    ref.set(update, { merge: true }).catch(function(e){ console.warn('[courseProgress] start write failed:', e.message); });
+  }).catch(function(e){ console.warn('[courseProgress] start read failed:', e.message); });
+}
+
+function cpWriteModuleComplete() {
+  if (!cpReady()) return;
+  var ref = cpDocRef();
+  ref.get().then(function(snap){
+    var data = snap.exists ? (snap.data() || {}) : {};
+    var course = (data.courses && data.courses[CP_COURSE_ID]) || {};
+    var mods = course.modules || {};
+    if (mods[MODULE_ID] && mods[MODULE_ID].completedOn) return; // idempotent
+    var t = cpNow();
+    var startMs = null, mEntry = mods[MODULE_ID];
+    if (mEntry && mEntry.startedOn && mEntry.startedAt) startMs = new Date(mEntry.startedOn + 'T' + mEntry.startedAt).getTime();
+    var moduleTimeTaken = startMs != null ? cpFmtDuration(t.ms - startMs) : null;
+
+    var courseUpdate = { modules: {} };
+    courseUpdate.modules[MODULE_ID] = { completedOn: t.date, completedAt: t.time, timeTaken: moduleTimeTaken };
+    if (course.moduleInProgress === MODULE_ID) courseUpdate.moduleInProgress = null;
+
+    var completedCount = 0;
+    CP_MODULE_IDS.forEach(function(id){
+      if (id === MODULE_ID) { completedCount++; return; }
+      if (mods[id] && mods[id].completedOn) completedCount++;
+    });
+    if (completedCount >= CP_MODULE_IDS.length && !course.courseCompletedOn) {
+      courseUpdate.courseCompletedOn = t.date; courseUpdate.courseCompletedAt = t.time;
+      if (course.courseStartedOn && course.courseStartedAt) {
+        var cStart = new Date(course.courseStartedOn + 'T' + course.courseStartedAt).getTime();
+        courseUpdate.timeTaken = cpFmtDuration(t.ms - cStart);
+      }
+    }
+    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, courses: {} };
+    update.courses[CP_COURSE_ID] = courseUpdate;
+    ref.set(update, { merge: true }).catch(function(e){ console.warn('[courseProgress] complete write failed:', e.message); });
+  }).catch(function(e){ console.warn('[courseProgress] complete read failed:', e.message); });
+}
+
+// Cache busting on internal links
+(function() {
+  function addVersion(url) {
+    if (!url || url.startsWith('http') || url.startsWith('#') || url.startsWith('mailto')) return url;
+    if (!url.endsWith('.html') && !url.includes('.html?')) return url;
+    const sep = url.includes('?') ? '&' : '?';
+    if (url.includes('v=' + CACHE_VERSION)) return url;
+    return url + sep + 'v=' + CACHE_VERSION;
+  }
+  document.querySelectorAll('a[href]').forEach(a => { a.href = addVersion(a.getAttribute('href')); });
+})();
+
+// Build panels immediately (content is static; auth gates the overlay only)
+buildSections();
+</script>
+
+</body>
+</html>
