@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EKS Skill Track · SF Skills Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@300;400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#eef2f7; --bg2:#ffffff; --bg3:#f0f4f9; --border:#d0dae8;
+    --text:#1a2332; --text-dim:#4a5568; --text-dimmer:#8fa3bc;
+    --blue:#1a6eb5; --blue-light:#e8f1fb; --blue-mid:#b8d0ed; --blue-dark:#0f4a7a;
+    --coral:#c0392b; --coral-light:#fdf0ee; --coral-mid:#f0b8b2;
+    --green:#1a6b3a; --green-light:#e8f5ed; --green-mid:#a3d4b8;
+    --amber:#92600a; --amber-light:#fdf3e3; --amber-mid:#e8cf9a;
+    --radius:12px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Merriweather Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+  .topnav { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; height:52px; display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:var(--text-dim); }
+  .topnav a { color:var(--blue); text-decoration:none; }
+  .topnav a:hover { text-decoration:underline; }
+  .sep { opacity:.4; }
+
+  /* Hero */
+  .hero { background:linear-gradient(135deg,var(--blue-dark),var(--blue)); color:#fff; padding:44px 40px 40px; }
+  .hero-wrap { max-width:1080px; margin:0 auto; }
+  .hero-eyebrow { font-size:13px; font-family:'Source Code Pro',monospace; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#bcd9f5; margin-bottom:10px; }
+  .hero-title { font-size:34px; font-weight:700; margin-bottom:10px; line-height:1.2; }
+  .hero-sub { font-size:17px; color:#e3eefb; line-height:1.7; max-width:760px; margin-bottom:18px; }
+  .hero-badge { display:inline-flex; align-items:center; gap:9px; background:rgba(255,255,255,.14); border:1.5px solid rgba(255,255,255,.3); border-radius:24px; padding:8px 16px; font-size:13.5px; font-weight:600; }
+  .hero-badge .hb-icon { font-size:15px; }
+
+  /* Skill progress strip */
+  .progress-strip { background:var(--bg2); border-bottom:1px solid var(--border); padding:18px 40px; }
+  .progress-strip-wrap { max-width:1080px; margin:0 auto; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+  .ps-label { font-size:14px; font-family:'Source Code Pro',monospace; font-weight:600; color:var(--text-dim); }
+  .ps-bar { flex:1; min-width:200px; height:10px; background:var(--bg3); border-radius:6px; overflow:hidden; border:1px solid var(--border); }
+  .ps-bar-fill { height:100%; background:var(--green); width:0%; transition:width .5s ease; }
+  .ps-count { font-size:14px; font-family:'Source Code Pro',monospace; font-weight:700; color:var(--text); white-space:nowrap; }
+  .ps-attained { display:none; align-items:center; gap:8px; font-size:14px; font-family:'Source Code Pro',monospace; font-weight:700; color:var(--green); }
+  .ps-attained.show { display:inline-flex; }
+
+  .main { max-width:1080px; margin:0 auto; padding:34px 40px 10px; }
+  .section-head { font-size:13px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); margin:6px 0 4px; }
+  .section-desc { font-size:15px; color:var(--text-dim); line-height:1.7; margin-bottom:22px; }
+
+  /* Module cards */
+  .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:18px; }
+  .card { background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--radius); padding:0; overflow:hidden; display:flex; flex-direction:column; transition:border-color .15s, box-shadow .15s, transform .15s; text-decoration:none; color:inherit; }
+  .card:hover { border-color:var(--blue-mid); box-shadow:0 6px 20px rgba(26,110,181,.1); transform:translateY(-2px); }
+  .card-band { background:var(--blue); color:#fff; padding:11px 18px; font-size:12px; font-family:'Source Code Pro',monospace; font-weight:600; letter-spacing:.1em; text-transform:uppercase; display:flex; align-items:center; justify-content:space-between; }
+  .card-band .cb-status { font-size:14px; }
+  .card.done .card-band { background:var(--green); }
+  .card.inprogress .card-band { background:var(--amber); }
+  .card-body { padding:18px 20px 20px; flex:1; display:flex; flex-direction:column; }
+  .card-title { font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px; line-height:1.3; }
+  .card-desc { font-size:14px; color:var(--text-dim); line-height:1.65; flex:1; margin-bottom:14px; }
+  .card-foot { display:flex; align-items:center; justify-content:space-between; font-size:12.5px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); }
+  .card-foot .cf-status { font-weight:600; }
+  .card.done .cf-status { color:var(--green); }
+  .card.inprogress .cf-status { color:var(--amber); }
+  .card-cta { font-size:13px; font-weight:700; color:var(--blue); font-family:'Merriweather Sans',sans-serif; }
+
+  /* Assessment card */
+  .assess-card { background:var(--bg2); border:1.5px solid var(--blue-mid); border-left:4px solid var(--blue); border-radius:var(--radius); padding:24px 26px; margin:24px 0 8px; display:flex; align-items:center; gap:22px; flex-wrap:wrap; text-decoration:none; color:inherit; transition:box-shadow .15s, transform .15s; }
+  .assess-card:hover { box-shadow:0 6px 20px rgba(26,110,181,.12); transform:translateY(-2px); }
+  .assess-icon { font-size:40px; flex-shrink:0; }
+  .assess-text { flex:1; min-width:260px; }
+  .assess-title { font-size:19px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .assess-desc { font-size:14.5px; color:var(--text-dim); line-height:1.7; }
+  .assess-note { display:inline-block; margin-top:10px; font-size:12.5px; font-family:'Source Code Pro',monospace; color:var(--amber); background:var(--amber-light); border:1px solid var(--amber-mid); border-radius:6px; padding:5px 11px; }
+  .assess-note.attained { color:var(--green); background:var(--green-light); border-color:var(--green-mid); }
+  .assess-cta { background:var(--blue); color:#fff; border:none; border-radius:8px; padding:13px 26px; font-size:15px; font-weight:700; font-family:'Merriweather Sans',sans-serif; white-space:nowrap; cursor:pointer; text-decoration:none; }
+  .assess-cta:hover { background:var(--blue-dark); }
+
+  footer { text-align:center; padding:30px 32px; font-size:11px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); border-top:1px solid var(--border); line-height:1.7; margin-top:30px; }
+
+  /* Auth */
+  .auth-overlay { position:fixed; inset:0; background:rgba(15,30,60,.7); display:flex; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(4px); }
+  .auth-overlay.hidden { display:none; }
+  .auth-box { background:#fff; border-radius:16px; padding:48px 40px; max-width:420px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+  .auth-logo { font-size:32px; margin-bottom:16px; }
+  .auth-title { font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .auth-sub { font-size:15px; color:var(--text-dim); line-height:1.6; margin-bottom:28px; }
+  .auth-google-btn { display:flex; align-items:center; justify-content:center; gap:12px; width:100%; padding:14px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; }
+  .auth-google-btn:hover { background:var(--blue-dark); }
+  .auth-google-btn svg { width:20px; height:20px; flex-shrink:0; }
+  .auth-divider { display:flex; align-items:center; gap:10px; margin:16px 0 14px; color:var(--text-dimmer); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  .auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .auth-input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:10px; outline:none; font-family:'Merriweather Sans',sans-serif; color:var(--text); background:#fff; display:block; }
+  .auth-input:focus { border-color:var(--blue); }
+  .auth-email-btn { display:block; width:100%; padding:14px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; margin-top:2px; }
+  .auth-email-btn:hover { background:var(--blue-dark); }
+  .auth-error { font-size:13px; color:var(--coral); margin-top:12px; font-family:'Source Code Pro',monospace; }
+  .auth-user-bar { background:var(--blue-light); border-bottom:1px solid var(--blue-mid); padding:8px 32px; font-size:13px; font-family:'Source Code Pro',monospace; color:var(--blue-dark); display:flex; align-items:center; justify-content:space-between; }
+  .auth-user-bar.hidden { display:none; }
+  .auth-signout { background:var(--blue); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:700; font-family:'Merriweather Sans',sans-serif; padding:8px 18px; text-decoration:none; }
+
+  @media(max-width:640px) { .topnav,.hero,.progress-strip,.main { padding-left:18px; padding-right:18px; } .hero-title { font-size:27px; } }
+</style>
+</head>
+<body>
+
+<!-- Auth overlay -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">☸️</div>
+    <div class="auth-title">EKS Skill Track</div>
+    <div class="auth-sub">Sign in with your SourceFuse account to access the track and save your progress.</div>
+    <button class="auth-google-btn" id="googleSignInBtn">
+      <svg viewBox="0 0 48 48"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="auth-divider">OR</div>
+    <input type="email" class="auth-input" id="authEmail" placeholder="you@sourcefuse.com" autocomplete="email">
+    <input type="password" class="auth-input" id="authPassword" placeholder="Password" autocomplete="current-password">
+    <button class="auth-email-btn" id="emailSignInBtn">Sign in with Email</button>
+    <div class="auth-error hidden" id="authError"></div>
+  </div>
+</div>
+
+<div class="auth-user-bar hidden" id="authUserBar">
+  <span id="authUserEmail"></span>
+  <button class="auth-signout" id="authSignOutBtn">Sign out</button>
+</div>
+
+<nav class="topnav">
+  <a href="../../index.html">SF Skills Hub</a>
+  <span class="sep">/</span>
+  <a href="../../index.html#devops">DevOps</a>
+  <span class="sep">/</span>
+  <span>EKS</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-wrap">
+    <div class="hero-eyebrow">DevOps · Skill Track</div>
+    <div class="hero-title">Amazon EKS</div>
+    <div class="hero-sub">Run production-grade Kubernetes on AWS — cluster foundations, compute, identity, networking, and operations — through real scenarios, hands-on labs, and AWS Well-Architected best practices.</div>
+    <!-- TODO: confirm exact "attained, not certified" wording once naming convention is locked -->
+    <span class="hero-badge"><span class="hb-icon">✓</span> Completing this track attests an attained skill.</span>
+  </div>
+</div>
+
+<div class="progress-strip">
+  <div class="progress-strip-wrap">
+    <span class="ps-label">Your progress</span>
+    <div class="ps-bar"><div class="ps-bar-fill" id="psBarFill"></div></div>
+    <span class="ps-count" id="psCount">0 of 5 modules complete</span>
+    <span class="ps-attained" id="psAttained">✓ Skill attained</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section-head">Modules</div>
+  <div class="section-desc">Five modules, each built around a real scenario with a hands-on lab you run in your own AWS sandbox. Work through them in order; your progress saves automatically.</div>
+  <div class="cards" id="moduleCards">
+    <!-- injected by JS -->
+  </div>
+
+  <div class="section-head" style="margin-top:32px;">Skill assessment</div>
+  <div class="section-desc">A randomized assessment of 30–45 questions drawn from across all five modules — no two learners see the same set. Self-paced and always available.</div>
+  <a class="assess-card" id="assessCard" href="eks-assessment.html">
+    <span class="assess-icon">🎯</span>
+    <div class="assess-text">
+      <div class="assess-title">EKS Skill Assessment</div>
+      <div class="assess-desc">Demonstrate your EKS competency across cluster foundations, compute, identity, networking, and operations. Questions are randomized per learner and include AWS Well-Architected reasoning.</div>
+      <span class="assess-note" id="assessNote">Best taken after completing all five modules.</span>
+    </div>
+    <span class="assess-cta">Start assessment →</span>
+  </a>
+</div>
+
+<footer>
+  SF Skills Hub · SourceFuse L&amp;D · DevOps / EKS
+  <!-- TODO: skill-attainment tagline once naming convention is locked -->
+</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const _FB_CONFIG = {
+  apiKey: "AIzaSyC-I-IOCq2fCwa471fsD5xOn6SYQSBDp7Q",
+  authDomain: "sfcertification-grafana.firebaseapp.com",
+  projectId: "sfcertification-grafana",
+  storageBucket: "sfcertification-grafana.firebasestorage.app",
+  messagingSenderId: "227322696511",
+  appId: "1:227322696511:web:12e7ced7dd3d45fa06798a"
+};
+if (!window._fbApp) { window._fbApp = firebase.initializeApp(_FB_CONFIG); }
+const _auth = firebase.auth(window._fbApp);
+const _provider = new firebase.auth.GoogleAuthProvider();
+_provider.setCustomParameters({ hd: 'sourcefuse.com' });
+
+function showOverlay()   { document.getElementById('authOverlay')?.classList.remove('hidden'); }
+function hideOverlay()   { document.getElementById('authOverlay')?.classList.add('hidden'); }
+function showUserBar(email) {
+  const bar = document.getElementById('authUserBar');
+  const em  = document.getElementById('authUserEmail');
+  if (bar) bar.classList.remove('hidden');
+  if (em)  em.textContent = 'Welcome, ' + email;
+}
+
+_auth.onAuthStateChanged(function(user) {
+  if (user) {
+    const email = user.email || '';
+    if (!email.endsWith('@sourcefuse.com')) {
+      const errEl = document.getElementById('authError');
+      if (errEl) { errEl.textContent = 'Please use your @sourcefuse.com account.'; errEl.classList.remove('hidden'); }
+      _auth.signOut();
+      showOverlay();
+      return;
+    }
+    window._learnerUid   = user.uid;
+    window._learnerEmail = email;
+    hideOverlay();
+    showUserBar(email);
+    loadProgress();
+  } else {
+    window._learnerUid   = null;
+    window._learnerEmail = null;
+    showOverlay();
+  }
+});
+
+document.getElementById('googleSignInBtn')?.addEventListener('click', function() {
+  _auth.signInWithPopup(_provider).catch(function(err) {
+    const el = document.getElementById('authError');
+    if (el) { el.textContent = err.message; el.classList.remove('hidden'); }
+  });
+});
+
+function eksEmailSignIn() {
+  const email = (document.getElementById('authEmail')?.value || '').trim().toLowerCase();
+  const pwd   =  document.getElementById('authPassword')?.value || '';
+  const el    =  document.getElementById('authError');
+  function fail(msg){ if(el){ el.textContent = msg; el.classList.remove('hidden'); } }
+  if (el) el.classList.add('hidden');
+  if (!email || !pwd) { fail('Please enter your email and password.'); return; }
+  if (!email.endsWith('@sourcefuse.com')) { fail('Only @sourcefuse.com accounts are allowed.'); return; }
+  _auth.signInWithEmailAndPassword(email, pwd).catch(function(err) {
+    const m = (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') ? 'Incorrect password.'
+            : (err.code === 'auth/user-not-found') ? 'No account found for this email.'
+            : err.message;
+    fail(m);
+  });
+}
+document.getElementById('emailSignInBtn')?.addEventListener('click', eksEmailSignIn);
+document.getElementById('authPassword')?.addEventListener('keydown', function(e){ if(e.key==='Enter') eksEmailSignIn(); });
+document.getElementById('authSignOutBtn')?.addEventListener('click', function() { _auth.signOut(); });
+</script>
+
+<script>
+const CACHE_VERSION = '2026-06-10-v1';
+const SP_SKILL_ID   = 'eks';   // skillsProgress → skills.eks
+
+console.log('%c[EKS Skill Track] eks-dashboard.html — v' + CACHE_VERSION, 'color:#1a6eb5;font-weight:bold;');
+
+// Module catalog — single source of truth for this skill's module list + links
+const MODULES = [
+  { id:'eks_m1', n:1, title:'Cluster Foundations',     file:'eks-module-1.html',
+    desc:'The managed control plane, the shared-responsibility split, provisioning with eksctl/Terraform, IAM-to-cluster access, and the upgrade lifecycle.' },
+  { id:'eks_m2', n:2, title:'Compute: Node Groups & Fargate', file:'eks-module-2.html',
+    desc:'Managed node groups vs. self-managed vs. Fargate, autoscaling, and choosing the right compute model for a workload.' },
+  { id:'eks_m3', n:3, title:'Identity: IRSA & Pod Identity',  file:'eks-module-3.html',
+    desc:'Mapping IAM to Kubernetes RBAC, IRSA and EKS Pod Identity, and least-privilege access for workloads.' },
+  { id:'eks_m4', n:4, title:'Networking',              file:'eks-module-4.html',
+    desc:'The VPC CNI, the AWS Load Balancer Controller, ingress, and exposing services securely.' },
+  { id:'eks_m5', n:5, title:'Operations',              file:'eks-module-5.html',
+    desc:'Add-ons, observability, upgrades in practice, and troubleshooting a running cluster.' }
+];
+
+function addVer(file) { return file + '?v=' + CACHE_VERSION; }
+
+function renderCards(modProgress) {
+  const root = document.getElementById('moduleCards');
+  root.innerHTML = '';
+  MODULES.forEach(function(m) {
+    const mp = (modProgress && modProgress[m.id]) || {};
+    const done = !!mp.completedOn;
+    const started = !!mp.startedOn && !done;
+    const stateClass = done ? 'done' : (started ? 'inprogress' : '');
+    const bandStatus = done ? '✓' : (started ? '◐' : ((m.n) ));
+    const statusText = done ? ('Completed ' + (mp.completedOn || '')) : (started ? 'In progress' : 'Not started');
+    const cta = done ? 'Review →' : (started ? 'Resume →' : 'Start →');
+
+    const a = document.createElement('a');
+    a.className = 'card ' + stateClass;
+    a.href = addVer(m.file);
+    a.innerHTML =
+        '<div class="card-band"><span>Module ' + m.n + ' of 5</span><span class="cb-status">' + (done ? '✓' : (started ? '◐' : '')) + '</span></div>'
+      + '<div class="card-body">'
+      +   '<div class="card-title">' + m.title + '</div>'
+      +   '<div class="card-desc">' + m.desc + '</div>'
+      +   '<div class="card-foot"><span class="cf-status">' + statusText + '</span><span class="card-cta">' + cta + '</span></div>'
+      + '</div>';
+    root.appendChild(a);
+  });
+}
+
+function renderProgressStrip(modProgress, attainedOn) {
+  let done = 0;
+  MODULES.forEach(function(m) {
+    if (modProgress && modProgress[m.id] && modProgress[m.id].completedOn) done++;
+  });
+  const pct = Math.round((done / MODULES.length) * 100);
+  document.getElementById('psBarFill').style.width = pct + '%';
+  document.getElementById('psCount').textContent = done + ' of ' + MODULES.length + ' modules complete';
+
+  const attainedEl = document.getElementById('psAttained');
+  if (attainedOn) { attainedEl.classList.add('show'); attainedEl.textContent = '✓ Skill attained ' + attainedOn; }
+  else { attainedEl.classList.remove('show'); }
+
+  // Soft, non-blocking note on the (always-accessible) assessment card
+  const note = document.getElementById('assessNote');
+  if (attainedOn) {
+    note.classList.add('attained');
+    note.textContent = '✓ Skill attained — you can retake the assessment any time.';
+  } else if (done >= MODULES.length) {
+    note.classList.remove('attained');
+    note.textContent = 'All modules complete — you\'re ready for the assessment.';
+  } else {
+    note.classList.remove('attained');
+    note.textContent = 'Best taken after completing all five modules · ' + done + '/' + MODULES.length + ' done so far.';
+  }
+}
+
+function loadProgress() {
+  // Default render (not-started) so the page is populated even before/without data
+  renderCards({});
+  renderProgressStrip({}, null);
+
+  if (!window._fbApp || !window._learnerUid) return;
+  firebase.firestore(window._fbApp).collection('skillsProgress').doc(window._learnerUid).get()
+    .then(function(snap){
+      const data = snap.exists ? (snap.data() || {}) : {};
+      const skill = (data.skills && data.skills[SP_SKILL_ID]) || {};
+      const mods = skill.modules || {};
+      renderCards(mods);
+      renderProgressStrip(mods, skill.skillAttainedOn || null);
+    })
+    .catch(function(e){ console.warn('[skillsProgress] dashboard read failed:', e.message); });
+}
+
+// Cache-bust internal links already handled per-card via addVer().
+</script>
+
+</body>
+</html>
