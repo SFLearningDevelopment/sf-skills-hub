@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SF Skills Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@300;400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#eef2f7; --bg2:#ffffff; --bg3:#f0f4f9; --border:#d0dae8;
+    --text:#1a2332; --text-dim:#4a5568; --text-dimmer:#8fa3bc;
+    --blue:#1a6eb5; --blue-light:#e8f1fb; --blue-mid:#b8d0ed; --blue-dark:#0f4a7a;
+    --green:#1a6b3a; --green-light:#e8f5ed; --green-mid:#a3d4b8;
+    --radius:12px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Merriweather Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+  .topnav { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; height:52px; display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:var(--text-dim); }
+  .topnav a { color:var(--blue); text-decoration:none; }
+
+  .hero { background:linear-gradient(135deg,var(--blue-dark),var(--blue)); color:#fff; padding:48px 40px 44px; }
+  .hero-wrap { max-width:1080px; margin:0 auto; }
+  .hero-title { font-size:36px; font-weight:700; margin-bottom:12px; }
+  .hero-sub { font-size:17px; color:#e3eefb; line-height:1.7; max-width:780px; }
+  .hero-badge { display:inline-flex; align-items:center; gap:9px; background:rgba(255,255,255,.14); border:1.5px solid rgba(255,255,255,.3); border-radius:24px; padding:8px 16px; font-size:13.5px; font-weight:600; margin-top:18px; }
+
+  .main { max-width:1080px; margin:0 auto; padding:36px 40px 10px; }
+
+  .group { margin-bottom:38px; }
+  .group-head { display:flex; align-items:center; gap:12px; margin-bottom:4px; }
+  .group-icon { font-size:22px; }
+  .group-title { font-size:20px; font-weight:700; color:var(--text); }
+  .group-tag { font-size:11px; font-family:'Source Code Pro',monospace; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dimmer); background:var(--bg3); border:1px solid var(--border); border-radius:20px; padding:3px 10px; }
+  .group-desc { font-size:14.5px; color:var(--text-dim); line-height:1.65; margin-bottom:16px; }
+
+  .skills { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+  .skill-card { background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--radius); padding:20px 22px; display:flex; flex-direction:column; text-decoration:none; color:inherit; transition:border-color .15s, box-shadow .15s, transform .15s; }
+  .skill-card.live:hover { border-color:var(--blue-mid); box-shadow:0 6px 20px rgba(26,110,181,.1); transform:translateY(-2px); }
+  .skill-card.soon { opacity:.7; cursor:default; }
+  .skill-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .skill-name { font-size:17px; font-weight:700; color:var(--text); }
+  .skill-status { font-size:11px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 10px; border-radius:20px; }
+  .skill-status.live { color:var(--green); background:var(--green-light); border:1px solid var(--green-mid); }
+  .skill-status.soon { color:var(--text-dimmer); background:var(--bg3); border:1px solid var(--border); }
+  .skill-desc { font-size:13.5px; color:var(--text-dim); line-height:1.6; flex:1; margin-bottom:12px; }
+  .skill-cta { font-size:13px; font-weight:700; color:var(--blue); }
+  .skill-card.soon .skill-cta { color:var(--text-dimmer); }
+
+  footer { text-align:center; padding:30px 32px; font-size:11px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); border-top:1px solid var(--border); line-height:1.7; margin-top:24px; }
+
+  @media(max-width:640px) { .topnav,.hero,.main { padding-left:18px; padding-right:18px; } .hero-title { font-size:28px; } }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">SF Skills Hub</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-wrap">
+    <div class="hero-title">SF Skills Hub</div>
+    <div class="hero-sub">Self-paced, hands-on skill tracks for SourceFuse teams. Each track pairs real-world scenarios with labs you run yourself and best practices drawn from industry frameworks.</div>
+    <!-- TODO: confirm exact "attained, not certified" wording once naming convention is locked -->
+    <span class="hero-badge"><span>✓</span> Completing a track attests an attained skill.</span>
+  </div>
+</div>
+
+<div class="main" id="groupsRoot">
+  <!-- injected by JS -->
+</div>
+
+<footer>
+  SF Skills Hub · SourceFuse L&amp;D
+</footer>
+
+<script>
+const CACHE_VERSION = '2026-06-10-v1';
+
+// Group / skill catalog. Add skills here as they go live.
+// path is relative to repo root (this index.html sits at sf-skills-hub/index.html).
+const GROUPS = [
+  {
+    id:'devops', icon:'🛠️', title:'DevOps Skills', tag:'devops',
+    desc:'Infrastructure, orchestration, CI/CD, and operations skills for DevOps Leads, Architects, and Engineers.',
+    skills:[
+      { name:'Amazon EKS', status:'live', path:'devops/eks/eks-dashboard.html',
+        desc:'Production Kubernetes on AWS — foundations, compute, identity, networking, and operations.' }
+      // Future: ECS, IAM, CloudWatch, CloudFormation/CDK, CodePipeline, Terraform …
+    ]
+  },
+  {
+    id:'aiml', icon:'🧠', title:'AI/ML Skills', tag:'aiml',
+    desc:'Languages, libraries, and workflows for the AI/ML team.',
+    skills:[
+      { name:'Python for AI/ML', status:'soon', path:'aiml/python/python-dashboard.html',
+        desc:'Python and the essential libraries for AI/ML work — planned next after the DevOps track.' }
+    ]
+  },
+  {
+    id:'engg', icon:'⚙️', title:'Engineering Skills', tag:'engg',
+    desc:'Core engineering practices and platform skills.',
+    skills:[]
+  },
+  {
+    id:'qa', icon:'🔍', title:'QA Skills', tag:'qa',
+    desc:'Testing strategy, automation, and quality engineering.',
+    skills:[]
+  },
+  {
+    id:'claude', icon:'✳️', title:'Claude Skills', tag:'claude',
+    desc:'Working effectively with Claude across engineering and knowledge work.',
+    skills:[]
+  }
+];
+
+function addVer(path) { return path + '?v=' + CACHE_VERSION; }
+
+function render() {
+  const root = document.getElementById('groupsRoot');
+  GROUPS.forEach(function(g) {
+    const sec = document.createElement('div');
+    sec.className = 'group';
+    sec.id = g.id;
+
+    let skillsHtml = '';
+    if (!g.skills.length) {
+      skillsHtml = '<div class="skills"><div class="skill-card soon">'
+        + '<div class="skill-card-top"><span class="skill-name">More skills coming</span>'
+        + '<span class="skill-status soon">Planned</span></div>'
+        + '<div class="skill-desc">Tracks for this group are on the roadmap.</div>'
+        + '<span class="skill-cta">Coming soon</span></div></div>';
+    } else {
+      let cards = '';
+      g.skills.forEach(function(s) {
+        const live = s.status === 'live';
+        if (live) {
+          cards += '<a class="skill-card live" href="' + addVer(s.path) + '">'
+            + '<div class="skill-card-top"><span class="skill-name">' + s.name + '</span>'
+            + '<span class="skill-status live">Live</span></div>'
+            + '<div class="skill-desc">' + s.desc + '</div>'
+            + '<span class="skill-cta">Open track →</span></a>';
+        } else {
+          cards += '<div class="skill-card soon">'
+            + '<div class="skill-card-top"><span class="skill-name">' + s.name + '</span>'
+            + '<span class="skill-status soon">Coming soon</span></div>'
+            + '<div class="skill-desc">' + s.desc + '</div>'
+            + '<span class="skill-cta">Coming soon</span></div>';
+        }
+      });
+      skillsHtml = '<div class="skills">' + cards + '</div>';
+    }
+
+    sec.innerHTML =
+        '<div class="group-head"><span class="group-icon">' + g.icon + '</span>'
+      + '<span class="group-title">' + g.title + '</span>'
+      + '<span class="group-tag">' + g.tag + '</span></div>'
+      + '<div class="group-desc">' + g.desc + '</div>'
+      + skillsHtml;
+    root.appendChild(sec);
+  });
+}
+
+render();
+console.log('%c[SF Skills Hub] index.html — v' + CACHE_VERSION, 'color:#1a6eb5;font-weight:bold;');
+</script>
+
+</body>
+</html>
