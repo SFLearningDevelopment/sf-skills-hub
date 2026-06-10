@@ -420,10 +420,10 @@ document.getElementById('authSignOutBtn')?.addEventListener('click', function() 
 <script src="eks-question-bank.js"></script>
 
 <script>
-const CACHE_VERSION = '2026-06-10-v1';
+const CACHE_VERSION = '2026-06-10-v2';
 const MODULE_ID    = 'eks_m1';
-const CP_COURSE_ID = 'eksSkillTrack2026';      /* TODO: confirm final course id when naming convention is locked */
-const CP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
+const SP_SKILL_ID  = 'eks';                    /* skillsProgress → skills.eks  (TODO: confirm slug when naming convention is locked) */
+const SP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
 const BANK_KEY     = 'm1';   // key into window.EKS_QUESTION_BANK
 
 console.log('%c[EKS Skill Track] eks-module-1.html — v' + CACHE_VERSION, 'color:#1a6eb5;font-weight:bold;');
@@ -912,74 +912,78 @@ document.addEventListener('learnerReady', function() {
   updateModuleProgress();
 });
 
-// ── courseProgress (uid-keyed; module map) ───────────────────────────────────
-function cpNow() {
+// ── skillsProgress (uid-keyed; skill → module map) ───────────────────────────
+// Separate from courseProgress: skills are "attained", not certified.
+//   skillsProgress/{uid} → { skills: { eks: { skillStartedOn, moduleInProgress,
+//     modules: { eks_m1: {startedOn, completedOn, timeTaken}, ... },
+//     skillAttainedOn } } }
+function spNow() {
   var d = new Date(); var pad = function(n){ return String(n).padStart(2,'0'); };
   return { date: d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),
            time: pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()), ms: d.getTime() };
 }
-function cpFmtDuration(ms) {
+function spFmtDuration(ms) {
   if (ms == null || ms < 0) return null;
   var s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
   if (h > 0) return h+'h '+m+'m '+sec+'s';
   if (m > 0) return m+'m '+sec+'s';
   return sec+'s';
 }
-function cpDb() { return firebase.firestore(window._fbApp); }
-function cpDocRef() { return cpDb().collection('courseProgress').doc(window._learnerUid); }
-function cpReady() { return window._fbApp && window._learnerUid && window._learnerUid !== 'anon'; }
+function spDb() { return firebase.firestore(window._fbApp); }
+function spDocRef() { return spDb().collection('skillsProgress').doc(window._learnerUid); }
+function spReady() { return window._fbApp && window._learnerUid && window._learnerUid !== 'anon'; }
 
 function cpEnsureModuleStarted() {
-  if (!cpReady()) return;
-  var ref = cpDocRef();
+  if (!spReady()) return;
+  var ref = spDocRef();
   ref.get().then(function(snap){
     var data = snap.exists ? (snap.data() || {}) : {};
-    var course = (data.courses && data.courses[CP_COURSE_ID]) || {};
-    var mods = course.modules || {};
-    var t = cpNow();
-    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, courses: {} };
-    update.courses[CP_COURSE_ID] = { moduleInProgress: MODULE_ID, modules: {} };
-    if (!course.courseStartedOn) { update.courses[CP_COURSE_ID].courseStartedOn = t.date; update.courses[CP_COURSE_ID].courseStartedAt = t.time; }
+    var skill = (data.skills && data.skills[SP_SKILL_ID]) || {};
+    var mods = skill.modules || {};
+    var t = spNow();
+    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, skills: {} };
+    update.skills[SP_SKILL_ID] = { moduleInProgress: MODULE_ID, modules: {} };
+    if (!skill.skillStartedOn) { update.skills[SP_SKILL_ID].skillStartedOn = t.date; update.skills[SP_SKILL_ID].skillStartedAt = t.time; }
     if (!mods[MODULE_ID] || !mods[MODULE_ID].startedOn) {
-      update.courses[CP_COURSE_ID].modules[MODULE_ID] = { startedOn: t.date, startedAt: t.time };
+      update.skills[SP_SKILL_ID].modules[MODULE_ID] = { startedOn: t.date, startedAt: t.time };
     }
-    ref.set(update, { merge: true }).catch(function(e){ console.warn('[courseProgress] start write failed:', e.message); });
-  }).catch(function(e){ console.warn('[courseProgress] start read failed:', e.message); });
+    ref.set(update, { merge: true }).catch(function(e){ console.warn('[skillsProgress] start write failed:', e.message); });
+  }).catch(function(e){ console.warn('[skillsProgress] start read failed:', e.message); });
 }
 
 function cpWriteModuleComplete() {
-  if (!cpReady()) return;
-  var ref = cpDocRef();
+  if (!spReady()) return;
+  var ref = spDocRef();
   ref.get().then(function(snap){
     var data = snap.exists ? (snap.data() || {}) : {};
-    var course = (data.courses && data.courses[CP_COURSE_ID]) || {};
-    var mods = course.modules || {};
+    var skill = (data.skills && data.skills[SP_SKILL_ID]) || {};
+    var mods = skill.modules || {};
     if (mods[MODULE_ID] && mods[MODULE_ID].completedOn) return; // idempotent
-    var t = cpNow();
+    var t = spNow();
     var startMs = null, mEntry = mods[MODULE_ID];
     if (mEntry && mEntry.startedOn && mEntry.startedAt) startMs = new Date(mEntry.startedOn + 'T' + mEntry.startedAt).getTime();
-    var moduleTimeTaken = startMs != null ? cpFmtDuration(t.ms - startMs) : null;
+    var moduleTimeTaken = startMs != null ? spFmtDuration(t.ms - startMs) : null;
 
-    var courseUpdate = { modules: {} };
-    courseUpdate.modules[MODULE_ID] = { completedOn: t.date, completedAt: t.time, timeTaken: moduleTimeTaken };
-    if (course.moduleInProgress === MODULE_ID) courseUpdate.moduleInProgress = null;
+    var skillUpdate = { modules: {} };
+    skillUpdate.modules[MODULE_ID] = { completedOn: t.date, completedAt: t.time, timeTaken: moduleTimeTaken };
+    if (skill.moduleInProgress === MODULE_ID) skillUpdate.moduleInProgress = null;
 
     var completedCount = 0;
-    CP_MODULE_IDS.forEach(function(id){
+    SP_MODULE_IDS.forEach(function(id){
       if (id === MODULE_ID) { completedCount++; return; }
       if (mods[id] && mods[id].completedOn) completedCount++;
     });
-    if (completedCount >= CP_MODULE_IDS.length && !course.courseCompletedOn) {
-      courseUpdate.courseCompletedOn = t.date; courseUpdate.courseCompletedAt = t.time;
-      if (course.courseStartedOn && course.courseStartedAt) {
-        var cStart = new Date(course.courseStartedOn + 'T' + course.courseStartedAt).getTime();
-        courseUpdate.timeTaken = cpFmtDuration(t.ms - cStart);
+    if (completedCount >= SP_MODULE_IDS.length && !skill.skillAttainedOn) {
+      skillUpdate.skillAttainedOn = t.date; skillUpdate.skillAttainedAt = t.time;
+      if (skill.skillStartedOn && skill.skillStartedAt) {
+        var sStart = new Date(skill.skillStartedOn + 'T' + skill.skillStartedAt).getTime();
+        skillUpdate.timeTaken = spFmtDuration(t.ms - sStart);
       }
     }
-    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, courses: {} };
-    update.courses[CP_COURSE_ID] = courseUpdate;
-    ref.set(update, { merge: true }).catch(function(e){ console.warn('[courseProgress] complete write failed:', e.message); });
-  }).catch(function(e){ console.warn('[courseProgress] complete read failed:', e.message); });
+    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, skills: {} };
+    update.skills[SP_SKILL_ID] = skillUpdate;
+    ref.set(update, { merge: true }).catch(function(e){ console.warn('[skillsProgress] complete write failed:', e.message); });
+  }).catch(function(e){ console.warn('[skillsProgress] complete read failed:', e.message); });
 }
 
 // Cache busting on internal links
