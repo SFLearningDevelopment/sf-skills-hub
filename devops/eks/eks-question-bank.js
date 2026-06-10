@@ -175,5 +175,177 @@ window.EKS_QUESTION_BANK = {
         type: "pillar"
       }
     ]
+  },
+
+  m2: {
+    /* ── Section 1: Managed node groups vs. self-managed ── */
+    s1: [
+      {
+        q: "What is the defining advantage of an EKS managed node group over a self-managed group of EC2 instances you wire up yourself?",
+        options: [
+          "Managed node groups run without any EC2 cost",
+          "AWS handles provisioning, lifecycle, and graceful draining/cordoning of nodes during updates, while you still own the workloads on them",
+          "Managed node groups remove the need for a VPC",
+          "Self-managed groups cannot run Kubernetes at all"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A team hand-rolls its worker nodes with custom scripts, and node OS patching has silently fallen months behind because the process is manual. Which Well-Architected-aligned fix best addresses this?",
+        options: [
+          "Move to managed node groups so AMI/patch updates are an AWS-driven, repeatable operation rather than a manual chore",
+          "Stop patching nodes entirely to avoid the effort",
+          "Run all workloads on a single very large node to reduce the patch surface",
+          "Disable updates and recreate the cluster yearly"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Choosing managed node groups so that node lifecycle and patching become a repeatable, low-toil operation most directly supports which pillar?",
+        options: [
+          "Operational Excellence, by reducing manual operational effort and standardizing node lifecycle",
+          "Cost Optimization, because managed nodes are always cheaper",
+          "Performance Efficiency, because managed nodes are faster",
+          "Sustainability, exclusively"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ],
+
+    /* ── Section 2: Fargate — serverless pods ── */
+    s2: [
+      {
+        q: "With EKS on Fargate, what changes about who manages the compute your pods run on?",
+        options: [
+          "Nothing — you still provision and patch EC2 nodes",
+          "AWS provisions right-sized, isolated compute per pod on demand; there are no EC2 worker nodes for you to manage or patch",
+          "Pods stop needing CPU or memory",
+          "You must run a second control plane for Fargate"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A small, bursty internal service runs on a node group sized for peak, so most of the time the team pays for idle capacity. They want to stop paying for nodes that sit empty. Which option best fits?",
+        options: [
+          "Run the service on Fargate so compute is provisioned per pod and you pay for what the pods actually request, with no idle node capacity",
+          "Buy a larger node to be safe",
+          "Run two clusters for redundancy",
+          "Disable autoscaling so capacity is predictable"
+        ],
+        correctIndex: 0,
+        type: "scenario"
+      },
+      {
+        q: "Eliminating idle, always-on node capacity by running bursty workloads on per-pod Fargate compute most directly supports which pillar?",
+        options: [
+          "Cost Optimization, by paying for compute the workload actually uses instead of idle nodes",
+          "Reliability, exclusively",
+          "Security, exclusively",
+          "Performance Efficiency, because Fargate pods are always faster than EC2"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      },
+      {
+        q: "Which is a genuine constraint to weigh before choosing Fargate for a workload?",
+        options: [
+          "Fargate cannot run Linux containers",
+          "Fargate does not support certain workloads — e.g. those needing DaemonSets, privileged pods, or specific host-level access — and per-pod pricing can cost more than packed EC2 for steady, dense workloads",
+          "Fargate requires you to manage etcd",
+          "Fargate only works without a VPC"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      }
+    ],
+
+    /* ── Section 3: Scaling — Cluster Autoscaler / Karpenter & pod autoscaling ── */
+    s3: [
+      {
+        q: "In a node-group-based cluster, what is the role of a node autoscaler such as the Cluster Autoscaler or Karpenter?",
+        options: [
+          "It scales the number of pods up and down",
+          "It adds or removes worker nodes in response to pods that can't be scheduled (or nodes that are underused), so capacity tracks demand",
+          "It patches the control plane",
+          "It replaces the need for a Deployment"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "How does node autoscaling differ from the Horizontal Pod Autoscaler (HPA)?",
+        options: [
+          "They are two names for the same thing",
+          "The HPA changes the number of pod replicas based on metrics like CPU; the node autoscaler changes the number of nodes so those pods have somewhere to run — they work together",
+          "The HPA manages nodes and the node autoscaler manages pods",
+          "Only one can be enabled per cluster"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A cluster runs a fixed, large node group around the clock to absorb occasional spikes, leaving most capacity idle off-peak. Which Well-Architected-aligned fix best matches capacity to demand?",
+        options: [
+          "Adopt node autoscaling (Cluster Autoscaler or Karpenter) plus an HPA so nodes and pods scale with actual load instead of being statically over-provisioned",
+          "Manually resize the node group every morning and evening",
+          "Always run at peak size to be safe",
+          "Move the control plane to a bigger instance"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Letting capacity scale up under load and back down when idle, rather than statically provisioning for peak, primarily serves which two pillars?",
+        options: [
+          "Cost Optimization and Performance Efficiency — you pay for what you need while still meeting demand",
+          "Security and Sustainability only",
+          "Reliability and Security only",
+          "There is no pillar relevance to autoscaling"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ],
+
+    /* ── Section 4: Choosing a compute model ── */
+    s4: [
+      {
+        q: "For a steady, dense, cost-sensitive batch workload running 24/7, which compute model is usually most economical?",
+        options: [
+          "Fargate, because per-pod pricing is always cheapest",
+          "Well-packed EC2 managed node groups (optionally with Spot/savings plans), since steady dense load amortizes node cost better than per-pod Fargate pricing",
+          "A single giant node with no autoscaling",
+          "Running the workload on the control plane"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A team wants to run a small, spiky workload with the least operational overhead and no nodes to patch, accepting a possible per-pod price premium. Which model fits best?",
+        options: [
+          "Self-managed EC2 with hand-rolled scripts",
+          "Fargate — no nodes to manage or patch, compute provisioned per pod, ideal for small/bursty workloads where low ops overhead outweighs packing efficiency",
+          "A fixed peak-sized node group",
+          "Two clusters in active-active"
+        ],
+        correctIndex: 1,
+        type: "scenario"
+      },
+      {
+        q: "Deliberately matching each workload to the compute model that fits its load shape and ops profile — Fargate for bursty/low-toil, packed autoscaled EC2 for steady/dense — best reflects which pillar?",
+        options: [
+          "Cost Optimization, by selecting the most cost-effective compute for each workload's actual pattern",
+          "Security, exclusively",
+          "Reliability, exclusively",
+          "There is no pillar relevance to compute choice"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ]
   }
 };
