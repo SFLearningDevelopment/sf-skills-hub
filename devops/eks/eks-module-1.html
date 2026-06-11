@@ -296,14 +296,14 @@
     <p>Kubernetes <strong>RBAC (Role-Based Access Control)</strong> governs which identities may perform which actions on which resources. A <strong>Role</strong> is a set of permissions; a <strong>RoleBinding</strong> grants that Role to a user, group, or service account.</p>
     <div class="rf-eg">
       <div class="eg-label">Why this matters for EKS</div>
-      EKS connects <strong>AWS IAM identities to Kubernetes RBAC</strong>. When you run a <code>kubectl</code> command, AWS authenticates <em>who you are</em> (IAM), then Kubernetes decides <em>what you're allowed to do</em> (RBAC). Module 1 covers exactly how that mapping is wired — so this RBAC concept is the hook the AWS layer hangs on.
+      EKS connects <strong>AWS IAM identities to Kubernetes RBAC</strong>. When you run a <code>kubectl</code> command, AWS authenticates <em>who you are</em> (IAM), then Kubernetes decides <em>what you're allowed to do</em> (RBAC). EKS wires exactly this mapping together — so this RBAC concept is the hook the AWS layer hangs on.
     </div>
 
     <h3>How you talk to a cluster</h3>
     <p><strong>kubectl</strong> is the command-line tool for Kubernetes. It reads a <strong>kubeconfig</strong> file that tells it which cluster to reach and how to authenticate. Commands are declarative: you usually apply a YAML manifest describing desired state rather than issuing step-by-step imperative orders.</p>
     <div class="rf-eg"><div class="eg-label">Example</div><code>kubectl apply -f deployment.yaml</code> hands Kubernetes a description of what you want; the control plane figures out the steps to get there.</div>
 
-    <p class="rf-bridge">That's the whole foundation EKS builds on: a <strong>control plane</strong> holding desired state, <strong>worker nodes</strong> running your <strong>pods</strong>, <strong>Deployments</strong> keeping them alive, <strong>Services</strong> giving them stable addresses, and <strong>RBAC</strong> governing access. EKS keeps every one of these concepts unchanged — it simply runs the control plane <em>for</em> you and wires <strong>AWS IAM, networking, and scaling</strong> into the worker side. Everything ahead is "standard Kubernetes, plus the AWS layer." Keep the control-plane / node split in mind and Module 1 will click into place.</p>
+    <p class="rf-bridge">That's the whole foundation EKS builds on: a <strong>control plane</strong> holding desired state, <strong>worker nodes</strong> running your <strong>pods</strong>, <strong>Deployments</strong> keeping them alive, <strong>Services</strong> giving them stable addresses, and <strong>RBAC</strong> governing access. EKS keeps every one of these concepts unchanged — it simply runs the control plane <em>for</em> you and wires <strong>AWS IAM, networking, and scaling</strong> into the worker side. Everything ahead is "standard Kubernetes, plus the AWS layer." Keep the control-plane / node split in mind and the material ahead will click into place.</p>
 
     <button class="refresh-close" onclick="toggleRefresh()">Close primer ▲</button>
   </div>
@@ -420,7 +420,7 @@ document.getElementById('authSignOutBtn')?.addEventListener('click', function() 
 <script src="eks-question-bank.js"></script>
 
 <script>
-const CACHE_VERSION = '2026-06-10-v2';
+const CACHE_VERSION = '2026-06-10-v3';
 const MODULE_ID    = 'eks_m1';
 const SP_SKILL_ID  = 'eks';                    /* skillsProgress → skills.eks  (TODO: confirm slug when naming convention is locked) */
 const SP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
