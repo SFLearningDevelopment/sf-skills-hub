@@ -261,10 +261,10 @@
 
   <div class="refresh-panel" id="refreshPanel">
     <h3>The operational toolkit this module builds on</h3>
-    <p>This is the capstone module: running a cluster day after day — keeping its core components current, seeing what it's doing, upgrading it safely, and fixing it when something breaks. It pulls together threads from all four earlier modules. A few operational fundamentals make it click.</p>
+    <p>This module is about running a cluster day after day — keeping its core components current, seeing what it's doing, upgrading it safely, and fixing it when something breaks. A few operational fundamentals make it click.</p>
 
     <h3>Reading a cluster with kubectl</h3>
-    <p>Most day-2 work starts with a handful of <strong>kubectl</strong> commands that tell you what the cluster is actually doing:</p>
+    <p>Most operational work starts with a handful of <strong>kubectl</strong> commands that tell you what the cluster is actually doing:</p>
     <ul>
       <li><strong><code>kubectl get</code></strong> — list resources and their high-level status (e.g. <code>get pods</code>, <code>get nodes</code>).</li>
       <li><strong><code>kubectl describe</code></strong> — detailed state <em>and events</em> for one resource. The events at the bottom usually explain <em>why</em> something is stuck.</li>
@@ -285,16 +285,16 @@
     </ul>
     <div class="rf-eg"><div class="eg-label">Connecting to your other work</div>If you've built the Prometheus or Grafana skill tracks, this is where they meet EKS — the same monitoring stack instruments your cluster and workloads here.</div>
 
-    <h3>How the earlier modules show up in operations</h3>
-    <p>Day-2 operations is where Modules 1–4 become concrete:</p>
+    <h3>How problems map to cluster layers</h3>
+    <p>Operational issues usually trace back to one of a few layers of the cluster — and knowing which layer owns a symptom is half the diagnosis:</p>
     <ul>
-      <li><strong>Module 1 (foundations)</strong> — the upgrade lifecycle and ordering you'll apply in practice here.</li>
-      <li><strong>Module 2 (compute)</strong> — node groups roll during upgrades; autoscaling keeps capacity right while you operate.</li>
-      <li><strong>Module 3 (identity)</strong> — a workload that suddenly can't reach AWS is often an IRSA/Pod Identity or least-privilege-policy issue.</li>
-      <li><strong>Module 4 (networking)</strong> — connectivity problems trace back to the VPC CNI, network policy, or load balancer config.</li>
+      <li><strong>Compute</strong> — node capacity and autoscaling: a pod that can't be scheduled often points here.</li>
+      <li><strong>Identity</strong> — a workload that suddenly can't reach AWS is often an IAM-role association or an over-tight permission policy.</li>
+      <li><strong>Networking</strong> — connectivity problems trace back to pod IP/CNI, network policy, DNS, or load balancer configuration.</li>
+      <li><strong>Core components</strong> — DNS and networking add-ons that have drifted out of compatibility can cause cluster-wide symptoms.</li>
     </ul>
 
-    <p class="rf-bridge">So the toolkit here is: <strong>kubectl</strong> to read the cluster, <strong>observability</strong> (metrics, logs, control-plane logging) to see it before it breaks, and a mental map of how <strong>earlier modules' pieces</strong> surface as operational issues. The four sections ahead — add-ons, observability, upgrades in practice, and troubleshooting — turn everything you've learned into the discipline of <em>running</em> a cluster, not just building one.</p>
+    <p class="rf-bridge">So the toolkit here is: <strong>kubectl</strong> to read the cluster, <strong>observability</strong> (metrics, logs, control-plane logging) to see it before it breaks, and a mental map of how symptoms point to the layer that owns them. The four sections ahead — add-ons, observability, upgrades, and troubleshooting — turn EKS knowledge into the discipline of <em>running</em> a cluster, not just building one.</p>
 
     <button class="refresh-close" onclick="toggleRefresh()">Close primer ▲</button>
   </div>
@@ -414,7 +414,7 @@ document.getElementById('authSignOutBtn')?.addEventListener('click', function() 
 <script src="eks-question-bank.js"></script>
 
 <script>
-const CACHE_VERSION = '2026-06-10-v1';
+const CACHE_VERSION = '2026-06-10-v2';
 const MODULE_ID    = 'eks_m5';
 const SP_SKILL_ID  = 'eks';                    /* skillsProgress → skills.eks  (TODO: confirm slug when naming convention is locked) */
 const SP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
