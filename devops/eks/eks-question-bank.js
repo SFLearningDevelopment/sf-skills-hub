@@ -691,5 +691,188 @@ window.EKS_QUESTION_BANK = {
         type: "scenario"
       }
     ]
+  },
+
+  m5: {
+    /* ── Section 1: Add-ons — managing core cluster components ── */
+    s1: [
+      {
+        q: "What are EKS managed add-ons (e.g. CoreDNS, kube-proxy, VPC CNI, EBS CSI driver)?",
+        options: [
+          "Optional third-party apps unrelated to the cluster",
+          "Core operational components of the cluster that EKS can install, version, and update for you through a managed mechanism rather than you maintaining them by hand",
+          "Billing plans for the control plane",
+          "A type of worker node"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A team installs CoreDNS and the VPC CNI from raw manifests and updates them manually, and the versions have drifted out of step with the cluster's Kubernetes version. Which Well-Architected-aligned fix applies?",
+        options: [
+          "Adopt EKS managed add-ons so these core components are version-managed and updated through a consistent, repeatable mechanism aligned with the cluster version",
+          "Stop using CoreDNS",
+          "Pin every add-on to its oldest version forever",
+          "Delete and recreate the cluster on each update"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Managing core components via EKS add-ons rather than hand-maintained manifests most directly serves which pillar?",
+        options: [
+          "Operational Excellence, by making core-component installation and updates consistent and repeatable",
+          "Cost Optimization, exclusively",
+          "Performance Efficiency, exclusively",
+          "There is no pillar relevance"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ],
+
+    /* ── Section 2: Observability — logs, metrics, and control-plane logging ── */
+    s2: [
+      {
+        q: "Why is enabling EKS control plane logging (API server, audit, authenticator logs to CloudWatch) valuable?",
+        options: [
+          "It speeds up the control plane",
+          "It gives you visibility into control-plane activity — API calls, authentication, and audit events — which is essential for troubleshooting and security investigation",
+          "It is required for pods to start",
+          "It replaces the need for worker nodes"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A cluster runs with no metrics or log aggregation, so when something breaks the team is debugging blind. Which Well-Architected-aligned fix applies?",
+        options: [
+          "Establish observability — metrics (e.g. Prometheus/CloudWatch), aggregated logs, and enabled control-plane logging — so issues can be detected and diagnosed",
+          "Restart the cluster whenever something breaks",
+          "Rely on users to report problems",
+          "Turn off logging to reduce noise"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Instrumenting a cluster with metrics, aggregated logs, and control-plane logging before incidents occur most directly serves which pillar?",
+        options: [
+          "Operational Excellence, by enabling you to observe, detect, and diagnose issues",
+          "Cost Optimization, exclusively",
+          "Security, exclusively",
+          "There is no pillar relevance"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      },
+      {
+        q: "Which integrates naturally with EKS for cluster and workload metrics, complementing your existing monitoring stack?",
+        options: [
+          "Only proprietary tools work with EKS",
+          "Prometheus for metrics collection (often with Grafana for dashboards), and/or CloudWatch Container Insights — both common, well-supported choices on EKS",
+          "Metrics are not possible on EKS",
+          "Only the control plane can be monitored, never workloads"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      }
+    ],
+
+    /* ── Section 3: Upgrades in practice ── */
+    s3: [
+      {
+        q: "Module 1 covered upgrade ordering (control plane → add-ons → nodes). In practice, what most reduces upgrade risk?",
+        options: [
+          "Upgrading production first to find issues fastest",
+          "Validating the upgrade in a non-production cluster first, checking for deprecated APIs, and ensuring pod disruption budgets are set so node rolls don't break availability",
+          "Skipping multiple versions at once to save time",
+          "Disabling workloads during the upgrade"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "Before upgrading, why check for deprecated/removed Kubernetes APIs?",
+        options: [
+          "Deprecated APIs make the cluster cheaper",
+          "A new Kubernetes version may remove APIs your manifests still use, breaking workloads on upgrade; finding and updating them beforehand prevents outages",
+          "APIs never change between versions",
+          "It is only relevant to the control plane, not workloads"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A team wants node-group upgrades to roll without dropping below safe replica counts for their services. Which Well-Architected-aligned practice applies?",
+        options: [
+          "Define Pod Disruption Budgets so the node-drain process keeps enough replicas running during the roll, preserving availability",
+          "Upgrade all nodes simultaneously",
+          "Remove all replicas before upgrading",
+          "Skip draining and force-delete pods"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Validating upgrades in non-prod and using disruption budgets so rolls don't dent availability most directly serves which pillar?",
+        options: [
+          "Reliability, by protecting workload availability through a tested, controlled upgrade",
+          "Cost Optimization, exclusively",
+          "Performance Efficiency, exclusively",
+          "There is no pillar relevance"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ],
+
+    /* ── Section 4: Troubleshooting a running cluster ── */
+    s4: [
+      {
+        q: "A pod is stuck in Pending. What is the most useful first diagnostic step?",
+        options: [
+          "Delete the cluster",
+          "Run kubectl describe pod to read its events — they usually state the reason (insufficient resources, no matching node, unschedulable, image issues)",
+          "Restart every node",
+          "Assume it is a control-plane outage"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "Pods are in CrashLoopBackOff. Which approach best isolates the cause?",
+        options: [
+          "Increase the number of replicas until some stay up",
+          "Inspect the container logs (kubectl logs, including --previous) and the pod's events/describe to find why the container exits, then fix the root cause",
+          "Delete the deployment and hope it resolves",
+          "Add more nodes"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A workload that recently worked now can't reach AWS APIs after an identity change. Drawing on earlier modules, what's a sound first hypothesis?",
+        options: [
+          "The control plane is down",
+          "Its IAM/role association (IRSA or Pod Identity) or a tightened least-privilege policy may be misconfigured or over-restrictive — check the assumed role and its permissions",
+          "Kubernetes itself removed AWS support",
+          "The cluster ran out of nodes"
+        ],
+        correctIndex: 1,
+        type: "scenario"
+      },
+      {
+        q: "Maintaining a methodical troubleshooting approach — events, logs, describe, recent changes — rather than guessing, most reflects which pillar?",
+        options: [
+          "Operational Excellence, through systematic diagnosis and learning from operational events",
+          "Cost Optimization, exclusively",
+          "Security, exclusively",
+          "There is no pillar relevance"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ]
   }
 };
