@@ -287,7 +287,7 @@
     <div class="rf-eg"><div class="eg-label">Why this matters for this module</div>The <strong>AWS Load Balancer Controller</strong> creates these load balancers automatically from your Kubernetes manifests — an ALB for an Ingress, an NLB for a LoadBalancer Service — instead of you wiring them by hand.</div>
 
     <h3>Kubernetes Service and Ingress</h3>
-    <p>From Module 1's refresher: a <strong>Service</strong> gives a set of pods one stable address. Building on that:</p>
+    <p>A <strong>Service</strong> gives a set of pods one stable address. Building on that:</p>
     <ul>
       <li><strong>Service type ClusterIP</strong> — reachable only inside the cluster (the default).</li>
       <li><strong>Service type LoadBalancer</strong> — asks the platform to put an external load balancer (an NLB, via the controller) in front of the Service.</li>
@@ -414,7 +414,7 @@ document.getElementById('authSignOutBtn')?.addEventListener('click', function() 
 <script src="eks-question-bank.js"></script>
 
 <script>
-const CACHE_VERSION = '2026-06-10-v1';
+const CACHE_VERSION = '2026-06-10-v2';
 const MODULE_ID    = 'eks_m4';
 const SP_SKILL_ID  = 'eks';                    /* skillsProgress → skills.eks  (TODO: confirm slug when naming convention is locked) */
 const SP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
