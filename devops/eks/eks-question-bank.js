@@ -508,5 +508,188 @@ window.EKS_QUESTION_BANK = {
         type: "pillar"
       }
     ]
+  },
+
+  m4: {
+    /* ── Section 1: The VPC CNI — pods as first-class VPC citizens ── */
+    s1: [
+      {
+        q: "What does the Amazon VPC CNI plugin do for pods in an EKS cluster?",
+        options: [
+          "It blocks all pod networking by default",
+          "It assigns each pod an IP address from the cluster's VPC subnets, so pods are routable as first-class citizens on the VPC network",
+          "It runs the control plane",
+          "It replaces the need for security groups"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "Because the VPC CNI gives pods real VPC IPs, what practical constraint must you plan for?",
+        options: [
+          "Pods cannot use TCP",
+          "Subnet IP exhaustion — each pod consumes a VPC IP, so subnets must be sized (or prefix delegation used) to accommodate pod density",
+          "Pods can only talk to the internet, never each other",
+          "Every pod needs its own VPC"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A team deployed a cluster into small /27 subnets and hit pod scheduling failures because IPs ran out as pod count grew. Which Well-Architected-aligned fix best addresses this?",
+        options: [
+          "Plan VPC/subnet CIDR sizing (and consider VPC CNI prefix delegation) up front to provide enough IP space for expected pod density",
+          "Stop scheduling pods past the limit",
+          "Give every pod the same IP",
+          "Disable the VPC CNI"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      }
+    ],
+
+    /* ── Section 2: Pod-to-pod & network policy ── */
+    s2: [
+      {
+        q: "By default, can pods in different namespaces of an EKS cluster reach each other over the network?",
+        options: [
+          "No — namespaces are fully network-isolated by default",
+          "Yes — by default Kubernetes networking is flat and allows pod-to-pod traffic across namespaces unless you add network policy to restrict it",
+          "Only if they share a node",
+          "Only the control plane can route between them"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A security review flags that any pod can talk to any other pod, including the payments service, with no restriction. Which Well-Architected-aligned fix applies?",
+        options: [
+          "Apply Kubernetes NetworkPolicies (enforced by the VPC CNI's network policy support or a CNI like Calico) to allow only required pod-to-pod traffic, denying the rest",
+          "Delete the payments service",
+          "Put every pod in one namespace",
+          "Rely on pods being on different nodes"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Restricting pod-to-pod traffic to only what each workload legitimately needs, instead of leaving the network flat and open, most directly serves which pillar?",
+        options: [
+          "Security, by segmenting the network and limiting lateral movement",
+          "Cost Optimization, exclusively",
+          "Performance Efficiency, exclusively",
+          "There is no pillar relevance"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      },
+      {
+        q: "EKS also lets you attach EC2 security groups to specific pods (security groups for pods). What does this enable?",
+        options: [
+          "Removing the need for any IAM",
+          "Applying VPC-level security group rules directly to designated pods, so pod traffic is governed by the same security groups used elsewhere in the VPC",
+          "Running pods without IP addresses",
+          "Disabling network policy"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      }
+    ],
+
+    /* ── Section 3: Exposing services — the AWS Load Balancer Controller ── */
+    s3: [
+      {
+        q: "What does the AWS Load Balancer Controller do in an EKS cluster?",
+        options: [
+          "It runs your application containers",
+          "It provisions and manages AWS Elastic Load Balancers (ALB for Ingress, NLB for Service type LoadBalancer) in response to Kubernetes Ingress/Service resources",
+          "It assigns pod IP addresses",
+          "It patches worker nodes"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "When you create a Kubernetes Ingress with the AWS Load Balancer Controller installed, what typically gets provisioned?",
+        options: [
+          "Nothing — Ingress is ignored on AWS",
+          "An Application Load Balancer (ALB) that routes external HTTP/HTTPS traffic to your services based on the Ingress rules",
+          "A new EKS cluster",
+          "A static key for the pod"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A team exposes services by manually creating and wiring up load balancers in the console, and the config drifts from what's in the cluster. Which Well-Architected-aligned fix applies?",
+        options: [
+          "Use the AWS Load Balancer Controller so load balancers are declaratively driven by Kubernetes Ingress/Service manifests, keeping infra in sync with the cluster",
+          "Keep creating load balancers by hand but more carefully",
+          "Expose every pod with a public IP",
+          "Stop using load balancers"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Letting load balancers be declaratively managed from Kubernetes manifests rather than hand-wired in the console most directly serves which pillar?",
+        options: [
+          "Operational Excellence, by keeping load balancer configuration in sync with the cluster and version-controllable",
+          "Security, exclusively",
+          "Cost Optimization, exclusively",
+          "There is no pillar relevance"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ],
+
+    /* ── Section 4: Secure ingress — TLS, scheme, and exposure ── */
+    s4: [
+      {
+        q: "For an internet-facing service, what is the recommended way to handle TLS termination with an ALB provisioned by the AWS Load Balancer Controller?",
+        options: [
+          "Disable TLS to simplify setup",
+          "Terminate TLS at the ALB using an ACM certificate, so HTTPS is handled at the load balancer with managed certificates",
+          "Hard-code a self-signed cert into every pod",
+          "Use plain HTTP and rely on the VPC"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "An internal-only admin service was exposed with an internet-facing load balancer because that was the default. Which Well-Architected-aligned fix applies?",
+        options: [
+          "Provision it as an internal (scheme: internal) load balancer so it's reachable only within the VPC/network, not the public internet",
+          "Leave it public but hope nobody finds it",
+          "Put a comment in the manifest saying it's internal",
+          "Expose it on every node's public IP"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Exposing only what must be public (internet-facing) and keeping internal services on internal load balancers, with TLS terminated at the ALB, most directly serves which pillar?",
+        options: [
+          "Security, by minimizing public exposure and encrypting traffic in transit",
+          "Cost Optimization, exclusively",
+          "Performance Efficiency, exclusively",
+          "Reliability, exclusively"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      },
+      {
+        q: "A latency-sensitive, high-throughput TCP workload (not HTTP) needs external exposure. Which AWS load balancer type is the natural fit via the controller?",
+        options: [
+          "An Application Load Balancer (ALB), since it's always best",
+          "A Network Load Balancer (NLB), which operates at layer 4 and suits high-throughput, low-latency TCP/UDP traffic",
+          "No load balancer is possible for TCP",
+          "A classic load balancer only"
+        ],
+        correctIndex: 1,
+        type: "scenario"
+      }
+    ]
   }
 };
