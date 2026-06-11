@@ -347,5 +347,166 @@ window.EKS_QUESTION_BANK = {
         type: "pillar"
       }
     ]
+  },
+
+  m3: {
+    /* ── Section 1: The problem with static credentials in pods ── */
+    s1: [
+      {
+        q: "Why is baking long-lived AWS access keys into a pod (as env vars or a mounted secret) considered an anti-pattern?",
+        options: [
+          "Pods cannot read environment variables",
+          "Static long-lived keys are hard to rotate, easily leaked, and grant standing access that outlives any single task — a large, persistent attack surface",
+          "AWS blocks all environment variables in EKS",
+          "Keys make pods start more slowly"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A workload reaches S3 using an access key/secret pasted into a Kubernetes Secret, shared across several pods and never rotated. Which Well-Architected-aligned fix best addresses this?",
+        options: [
+          "Replace static keys with a mechanism that gives each workload short-lived, automatically-rotated credentials scoped to just what it needs (IRSA or EKS Pod Identity)",
+          "Move the key into an environment variable instead of a Secret",
+          "Share one more powerful key so fewer keys exist overall",
+          "Rotate the key once a year by hand"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Eliminating long-lived static credentials in favor of short-lived, per-workload identity most directly serves which pillar?",
+        options: [
+          "Security, by reducing credential exposure and enforcing least-privilege, short-lived access",
+          "Cost Optimization, because identity is billed per key",
+          "Performance Efficiency, because temporary credentials are faster",
+          "Reliability, exclusively"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ],
+
+    /* ── Section 2: IRSA — IAM Roles for Service Accounts ── */
+    s2: [
+      {
+        q: "What does IRSA (IAM Roles for Service Accounts) actually associate?",
+        options: [
+          "An EC2 instance profile with the whole node",
+          "A Kubernetes service account with an IAM role, so pods using that service account assume the role and receive short-lived, scoped AWS credentials",
+          "A Kubernetes namespace with a VPC",
+          "A pod with the cluster's root credentials"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "IRSA relies on an OIDC identity provider associated with the cluster. What role does that OIDC provider play?",
+        options: [
+          "It stores the pod's container images",
+          "It lets AWS IAM trust the cluster's service account tokens, so a pod's projected token can be exchanged for IAM role credentials",
+          "It replaces the need for IAM entirely",
+          "It schedules pods onto nodes"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "Granting each workload its own IAM role via IRSA — rather than relying on the node's IAM role shared by every pod on that node — primarily improves what?",
+        options: [
+          "Pod startup speed",
+          "Least privilege: each workload gets only the permissions it needs, instead of inheriting the node role's broad permissions shared by all pods on the node",
+          "Cluster networking throughput",
+          "The number of nodes you can run"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A cluster gives every pod access to whatever the node's IAM role can do, so a single compromised pod can reach everything that role allows. Which Well-Architected-aligned fix applies?",
+        options: [
+          "Use IRSA (or Pod Identity) to give each workload a narrowly-scoped role, so a compromised pod is limited to that workload's permissions, not the node's",
+          "Give the node role even more permissions to simplify access",
+          "Disable IAM on the nodes",
+          "Run every pod as a DaemonSet"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      }
+    ],
+
+    /* ── Section 3: EKS Pod Identity ── */
+    s3: [
+      {
+        q: "What does EKS Pod Identity simplify compared to IRSA?",
+        options: [
+          "It removes the need to run any pods",
+          "It associates IAM roles with Kubernetes service accounts through an EKS-managed mechanism without requiring you to configure an OIDC provider and role trust policy per cluster",
+          "It makes IAM roles unnecessary",
+          "It only works on Fargate"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "An org runs many clusters and finds the per-cluster OIDC-provider and trust-policy setup for IRSA repetitive and error-prone to manage at scale. Which approach best reduces that operational overhead?",
+        options: [
+          "EKS Pod Identity, which uses a cluster add-on and reusable role associations, avoiding per-cluster OIDC trust-policy wiring",
+          "Go back to static keys for simplicity",
+          "Use the node role everywhere",
+          "Run one giant cluster instead"
+        ],
+        correctIndex: 0,
+        type: "scenario"
+      },
+      {
+        q: "Choosing EKS Pod Identity to make per-workload IAM associations reusable and less error-prone across many clusters most directly serves which pillar?",
+        options: [
+          "Operational Excellence, by reducing repetitive, error-prone identity configuration at scale",
+          "Cost Optimization, exclusively",
+          "Performance Efficiency, exclusively",
+          "There is no pillar relevance"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ],
+
+    /* ── Section 4: Designing least-privilege workload access ── */
+    s4: [
+      {
+        q: "When designing an IAM role for a specific workload (via IRSA or Pod Identity), what is the least-privilege approach?",
+        options: [
+          "Attach AdministratorAccess so it never lacks a permission",
+          "Grant only the specific actions on the specific resources the workload needs (e.g. read one S3 bucket), and nothing more",
+          "Reuse the cluster-creator's permissions",
+          "Give it the node role plus extra permissions"
+        ],
+        correctIndex: 1,
+        type: "technical"
+      },
+      {
+        q: "A workload only needs to read objects from one S3 bucket, but its role is granted s3:* on all buckets because that was quickest. Which Well-Architected-aligned fix applies?",
+        options: [
+          "Scope the role to s3:GetObject on that one bucket's ARN, removing the broad s3:* and all-bucket access",
+          "Leave it — broad access is more convenient",
+          "Add more services to the role to be safe",
+          "Switch the workload to the node role"
+        ],
+        correctIndex: 0,
+        type: "wa-fix"
+      },
+      {
+        q: "Carefully scoping each workload's IAM role to the minimum actions and resources it needs best reflects which pillar?",
+        options: [
+          "Security, through least-privilege access that limits blast radius if a workload is compromised",
+          "Cost Optimization, exclusively",
+          "Reliability, exclusively",
+          "Performance Efficiency, exclusively"
+        ],
+        correctIndex: 0,
+        type: "pillar"
+      }
+    ]
   }
 };
