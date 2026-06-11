@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 4 — Networking · EKS Skill Track</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@300;400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#eef2f7; --bg2:#ffffff; --bg3:#f0f4f9; --border:#d0dae8;
+    --text:#1a2332; --text-dim:#4a5568; --text-dimmer:#8fa3bc;
+    --blue:#1a6eb5; --blue-light:#e8f1fb; --blue-mid:#b8d0ed; --blue-dark:#0f4a7a;
+    --pm:#1a6eb5; --pm-light:#e8f1fb; --pm-mid:#b8d0ed; --pm-dark:#0f4a7a;
+    --coral:#c0392b; --coral-light:#fdf0ee; --coral-mid:#f0b8b2;
+    --green:#1a6b3a; --green-light:#e8f5ed; --green-mid:#a3d4b8;
+    --amber:#92600a; --amber-light:#fdf3e3; --amber-mid:#e8cf9a;
+    --code-bg:#1e2433; --code-text:#cdd6f4; --radius:12px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Merriweather Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+  .topnav { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; height:52px; display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:var(--text-dim); }
+  .topnav a { color:var(--pm); text-decoration:none; }
+  .topnav a:hover { text-decoration:underline; }
+  .sep { opacity:.4; }
+
+  /* Module header band */
+  .module-band { background:var(--bg2); border-bottom:1px solid var(--border); padding:24px 40px; }
+  .module-eyebrow { font-size:13px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+  .module-title { font-size:26px; font-weight:700; color:var(--text); }
+  .module-progress { font-size:13px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); margin-top:10px; }
+
+  /* Refresher primer */
+  .refresh-wrap { max-width:1100px; margin:18px auto 0; padding:0 32px; }
+  .refresh-toggle { width:100%; display:flex; align-items:center; gap:12px; padding:16px 20px; background:var(--blue-light); border:1.5px solid var(--blue-mid); border-left:3px solid var(--blue); border-radius:var(--radius); cursor:pointer; font-family:'Merriweather Sans',sans-serif; font-size:15.5px; font-weight:700; color:var(--blue-dark); text-align:left; transition:background .15s; }
+  .refresh-toggle:hover { background:var(--blue-light); border-color:var(--blue); }
+  .refresh-toggle .rt-icon { font-size:20px; flex-shrink:0; }
+  .refresh-toggle .rt-text { flex:1; }
+  .refresh-toggle .rt-sub { display:block; font-weight:400; font-size:13px; color:var(--text-dim); margin-top:3px; }
+  .refresh-toggle .rt-chev { font-size:13px; font-family:'Source Code Pro',monospace; transition:transform .2s; flex-shrink:0; }
+  .refresh-toggle.open .rt-chev { transform:rotate(180deg); }
+  .refresh-panel { display:none; margin-top:14px; background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--radius); padding:30px 34px; animation:fadeIn .25s ease; }
+  .refresh-panel.open { display:block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+  .refresh-panel h3 { font-size:20px; font-weight:700; color:var(--text); margin:26px 0 10px; }
+  .refresh-panel h3:first-child { margin-top:0; }
+  .refresh-panel h4 { font-size:16px; font-weight:700; color:var(--blue-dark); margin:18px 0 6px; }
+  .refresh-panel p { font-size:16px; color:var(--text-dim); line-height:1.8; margin-bottom:12px; }
+  .refresh-panel p strong { color:var(--text); font-weight:600; }
+  .refresh-panel ul { margin:0 0 14px; padding-left:22px; }
+  .refresh-panel li { font-size:15.5px; color:var(--text-dim); line-height:1.75; margin-bottom:8px; }
+  .refresh-panel li strong { color:var(--text); font-weight:600; }
+  .rf-eg { border-left:3px solid var(--green); background:var(--green-light); padding:12px 16px; border-radius:0 8px 8px 0; margin:8px 0 16px; font-size:14.5px; line-height:1.7; color:var(--text-dim); }
+  .rf-eg .eg-label { font-size:11px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--green); margin-bottom:5px; }
+  .rf-eg strong { color:var(--text); }
+  .rf-table { width:100%; border-collapse:collapse; margin:8px 0 4px; }
+  .rf-table th, .rf-table td { text-align:left; padding:10px 14px; border:1px solid var(--border); font-size:14.5px; vertical-align:top; }
+  .rf-table th { background:var(--bg3); font-weight:700; color:var(--text); }
+  .rf-table td { color:var(--text-dim); line-height:1.65; }
+  .rf-bridge { font-size:16px; color:var(--text-dim); line-height:1.8; margin:6px 0 18px; padding:14px 18px; background:var(--bg3); border-radius:8px; }
+  .rf-bridge strong { color:var(--text); font-weight:600; }
+  .refresh-close { margin-top:20px; padding:10px 20px; background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .refresh-close:hover { background:var(--bg3); }
+
+  /* Section pills */
+  .section-pills-wrap { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 40px; overflow-x:auto; }
+  .section-pills { display:flex; gap:0; }
+  .section-pill {
+    display:flex; align-items:center; gap:8px; padding:14px 18px;
+    font-size:15px; font-weight:700; color:var(--text-dimmer);
+    border-bottom:2px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none;
+    white-space:nowrap; transition:color .15s; font-family:'Merriweather Sans',sans-serif;
+  }
+  .section-pill .pnum {
+    width:26px; height:26px; border-radius:50%; background:var(--bg3); border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;
+    font-family:'Source Code Pro',monospace; flex-shrink:0; transition:all .15s;
+  }
+  .section-pill.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .section-pill.active .pnum { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .section-pill.done .pnum { background:var(--green); border-color:var(--green); color:#fff; }
+
+  .main { max-width:1100px; margin:0 auto; padding:32px; }
+
+  /* Section panel */
+  .section-panel { display:none; }
+  .section-panel.active { display:block; }
+
+  /* Tab row (within a section) */
+  .tabs-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; padding:0 8px; overflow-x:auto; }
+  .tabs { display:flex; gap:0; }
+  .tab-btn {
+    display:flex; align-items:center; gap:9px; padding:12px 16px;
+    font-size:14.5px; font-weight:700; color:var(--text-dimmer);
+    border-bottom:2px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none;
+    white-space:nowrap; transition:color .15s; font-family:'Merriweather Sans',sans-serif;
+  }
+  .tab-btn .num { width:24px; height:24px; border-radius:50%; background:var(--bg3); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; font-family:'Source Code Pro',monospace; flex-shrink:0; transition:all .15s; }
+  .tab-btn .tab-caption-wrap { display:flex; flex-direction:column; align-items:flex-start; line-height:1.15; }
+  .tab-btn .tab-name { font-size:14.5px; }
+  .tab-btn .tab-verb { font-size:10.5px; font-family:'Source Code Pro',monospace; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dimmer); margin-top:2px; }
+  .tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .tab-btn.active .num { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .tab-btn.active .tab-verb { color:var(--blue); }
+
+  .tab-body { background:var(--bg2); border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); padding:32px; }
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
+
+  .tab-label { font-size:13px; font-family:'Source Code Pro',monospace; font-weight:700; color:var(--blue); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+  .tab-heading { font-size:23px; font-weight:700; margin-bottom:18px; }
+
+  .prose { font-size:16.5px; color:var(--text-dim); line-height:1.85; margin-bottom:18px; }
+  .prose strong { color:var(--text); font-weight:600; }
+  .prose code, .inline-code { font-family:'Source Code Pro',monospace; font-size:0.88em; background:var(--bg3); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:var(--blue-dark); }
+
+  .callout { border-left:3px solid var(--blue); background:var(--blue-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; line-height:1.7; color:var(--text-dim); }
+  .callout-warn { border-left-color:var(--amber); background:var(--amber-light); }
+  .callout-bad  { border-left-color:var(--coral); background:var(--coral-light); }
+  .callout-good { border-left-color:var(--green); background:var(--green-light); }
+  .callout strong { color:var(--text); }
+
+  .example-block { background:var(--bg3); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin:18px 0; font-size:15.5px; line-height:1.8; color:var(--text-dim); }
+  .example-block .ex-label { font-size:12px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px; }
+
+  /* Well-Architected pillar tags */
+  .wa-pillar { display:inline-flex; align-items:center; gap:6px; font-family:'Source Code Pro',monospace; font-size:11.5px; font-weight:600; letter-spacing:.04em; padding:4px 10px; border-radius:20px; border:1.5px solid var(--blue-mid); background:var(--blue-light); color:var(--blue-dark); margin:0 6px 8px 0; }
+  .wa-pillar::before { content:"▲"; font-size:9px; }
+  .wa-legend { font-size:13px; color:var(--text-dimmer); font-family:'Source Code Pro',monospace; margin:2px 0 14px; }
+  .bp-item { margin:0 0 18px; }
+  .bp-item .bp-head { font-size:16.5px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .bp-item .bp-body { font-size:15.5px; color:var(--text-dim); line-height:1.8; }
+  .bp-item .bp-body strong { color:var(--text); }
+
+  /* Lab tab */
+  .lab-caveat { border-left:3px solid var(--amber); background:var(--amber-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:0 0 22px; font-size:14px; line-height:1.7; color:var(--text-dim); }
+  .lab-caveat strong { color:var(--text); }
+  .lab-step { margin:0 0 22px; }
+  .lab-step-head { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .lab-step-head .ls-num { width:24px; height:24px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; font-family:'Source Code Pro',monospace; flex-shrink:0; }
+  .lab-step p { font-size:15px; color:var(--text-dim); line-height:1.75; margin-bottom:10px; }
+  .code-block { position:relative; background:var(--code-bg); color:var(--code-text); border-radius:10px; padding:16px 18px; margin:10px 0 6px; font-family:'Source Code Pro',monospace; font-size:13.5px; line-height:1.7; overflow-x:auto; white-space:pre; }
+  .code-block .copy-btn { position:absolute; top:10px; right:10px; background:rgba(255,255,255,.12); color:#cdd6f4; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-family:'Source Code Pro',monospace; font-weight:600; cursor:pointer; letter-spacing:.05em; }
+  .code-block .copy-btn:hover { background:rgba(255,255,255,.22); }
+  .code-block .cmt { color:#8fa3bc; }
+  .lab-cleanup { border-left:3px solid var(--coral); background:var(--coral-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0 0; font-size:14px; line-height:1.7; color:var(--text-dim); }
+  .lab-cleanup strong { color:var(--text); }
+
+  .divider { height:1px; background:var(--border); margin:26px 0; }
+  .tab-nav-row { display:flex; justify-content:space-between; margin-top:24px; }
+  .continue-btn { padding:11px 22px; background:var(--blue); color:#fff; border:none; border-radius:8px; font-size:14.5px; font-weight:700; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; }
+  .continue-btn:hover { background:var(--blue-dark); }
+  .ghost-btn { padding:11px 20px; background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .ghost-btn:hover { background:var(--bg3); }
+  .ghost-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+  /* Assessment */
+  .assessment-sub { font-size:14.5px; color:var(--text-dim); line-height:1.7; margin-bottom:22px; }
+  .question-block { margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--border); }
+  .question-block:last-of-type { border-bottom:none; }
+  .q-num { font-size:11px; font-family:'Source Code Pro',monospace; color:var(--blue); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; font-weight:600; }
+  .q-text { font-size:15.5px; font-weight:600; color:var(--text); line-height:1.5; margin-bottom:14px; }
+  .options { display:flex; flex-direction:column; gap:10px; }
+  .option { display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border-radius:8px; border:1.5px solid var(--border); cursor:pointer; font-size:14.5px; color:var(--text-dim); line-height:1.5; transition:border-color .15s, background .15s; }
+  .option:hover { border-color:var(--blue-mid); background:var(--blue-light); }
+  .option input[type="radio"] { margin-top:3px; flex-shrink:0; accent-color:var(--blue); }
+  .submit-btn { margin-top:18px; padding:12px 28px; background:var(--blue); color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .submit-btn:disabled { background:var(--border); color:var(--text-dimmer); cursor:not-allowed; }
+  .submit-btn:not(:disabled):hover { background:var(--blue-dark); }
+  .submit-note { font-size:13px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); margin-top:8px; }
+  .submitted-wrap { text-align:center; padding:16px 0; }
+  .submitted-icon { font-size:34px; color:var(--green); margin-bottom:6px; }
+  .submitted-title { font-size:17px; font-weight:700; color:var(--green); margin-bottom:8px; }
+  .submitted-body { font-size:14.5px; color:var(--text-dim); line-height:1.7; }
+
+  .hidden { display:none !important; }
+
+  .bottom-nav { display:flex; justify-content:space-between; padding:28px 0 0; border-top:1px solid var(--border); margin-top:32px; }
+  .nav-btn { padding:12px 20px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; text-decoration:none; font-family:'Merriweather Sans',sans-serif; background:var(--blue); color:#fff; border:none; }
+  .nav-btn:hover { background:var(--blue-dark); }
+  .nav-btn.back { background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); }
+
+  footer { text-align:center; padding:26px 32px; font-size:11px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); border-top:1px solid var(--border); line-height:1.7; }
+  footer .attrib { display:block; margin-top:6px; opacity:.85; font-style:italic; }
+
+  /* Auth */
+  .auth-overlay { position:fixed; inset:0; background:rgba(15,30,60,.7); display:flex; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(4px); }
+  .auth-overlay.hidden { display:none; }
+  .auth-box { background:#fff; border-radius:16px; padding:48px 40px; max-width:420px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+  .auth-logo { font-size:32px; margin-bottom:16px; }
+  .auth-title { font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .auth-sub { font-size:15px; color:var(--text-dim); line-height:1.6; margin-bottom:28px; }
+  .auth-google-btn { display:flex; align-items:center; justify-content:center; gap:12px; width:100%; padding:14px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; }
+  .auth-google-btn:hover { background:var(--blue-dark); }
+  .auth-google-btn svg { width:20px; height:20px; flex-shrink:0; }
+  .auth-divider { display:flex; align-items:center; gap:10px; margin:16px 0 14px; color:var(--text-dimmer); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  .auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .auth-input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:10px; outline:none; font-family:'Merriweather Sans',sans-serif; color:var(--text); background:#fff; display:block; }
+  .auth-input:focus { border-color:var(--blue); }
+  .auth-email-btn { display:block; width:100%; padding:14px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; margin-top:2px; }
+  .auth-email-btn:hover { background:var(--blue-dark); }
+  .auth-error { font-size:13px; color:var(--coral); margin-top:12px; font-family:'Source Code Pro',monospace; }
+  .auth-user-bar { background:var(--blue-light); border-bottom:1px solid var(--blue-mid); padding:8px 32px; font-size:13px; font-family:'Source Code Pro',monospace; color:var(--blue-dark); display:flex; align-items:center; justify-content:space-between; }
+  .auth-user-bar.hidden { display:none; }
+  .auth-signout { background:var(--blue); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:700; font-family:'Merriweather Sans',sans-serif; padding:8px 18px; text-decoration:none; }
+
+  @media(max-width:640px) { .topnav,.main,.module-band { padding-left:18px; padding-right:18px; } .section-pills-wrap { padding-left:14px; } .tab-body { padding:22px 18px; } }
+</style>
+</head>
+<body>
+
+<!-- Auth overlay -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">☸️</div>
+    <div class="auth-title">EKS Skill Track</div>
+    <div class="auth-sub">Sign in with your SourceFuse account to access the track and save your progress.</div>
+    <button class="auth-google-btn" id="googleSignInBtn">
+      <svg viewBox="0 0 48 48"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="auth-divider">OR</div>
+    <input type="email" class="auth-input" id="authEmail" placeholder="you@sourcefuse.com" autocomplete="email">
+    <input type="password" class="auth-input" id="authPassword" placeholder="Password" autocomplete="current-password">
+    <button class="auth-email-btn" id="emailSignInBtn">Sign in with Email</button>
+    <div class="auth-error hidden" id="authError"></div>
+  </div>
+</div>
+
+<div class="auth-user-bar hidden" id="authUserBar">
+  <span id="authUserEmail"></span>
+  <button class="auth-signout" id="authSignOutBtn">Sign out</button>
+</div>
+
+<nav class="topnav">
+  <a href="eks-dashboard.html">Back to track dashboard</a>
+  <span class="sep">/</span>
+  <span>Module 1</span>
+  <span class="sep">/</span>
+  <span>Networking</span>
+</nav>
+
+<div class="module-band">
+  <div class="module-eyebrow">Module 4 of 5</div>
+  <div class="module-title">Networking</div>
+  <div class="module-progress" id="moduleProgress">0 of 4 sections complete</div>
+</div>
+
+<div class="refresh-wrap">
+  <button class="refresh-toggle" id="refreshToggle" onclick="toggleRefresh()">
+    <span class="rt-icon">💡</span>
+    <span class="rt-text">Do you want to refresh your knowledge of AWS &amp; Kubernetes networking?
+      <span class="rt-sub">A quick primer on VPCs, subnets, security groups, load balancers, and Kubernetes Services/Ingress — open it if the networking material feels fast-paced.</span>
+    </span>
+    <span class="rt-chev">▼ OPEN</span>
+  </button>
+
+  <div class="refresh-panel" id="refreshPanel">
+    <h3>The networking foundations this module builds on</h3>
+    <p>This module covers how traffic moves <em>to</em> and <em>between</em> pods in EKS: how pods get IP addresses, how they reach each other, and how outside users reach your services. Two worlds meet here — the <strong>AWS VPC network</strong> and <strong>Kubernetes networking</strong>. A few fundamentals from each make the whole module click.</p>
+
+    <h3>The VPC: your private network on AWS</h3>
+    <p>A <strong>VPC (Virtual Private Cloud)</strong> is your isolated network within AWS. It's carved into <strong>subnets</strong> — ranges of IP addresses, usually split across Availability Zones. Everything you run on AWS gets an IP from a subnet.</p>
+    <ul>
+      <li><strong>CIDR block</strong> — the IP address range of a VPC or subnet, written like <code>10.0.0.0/16</code>. A bigger range (smaller number after the slash) holds more addresses.</li>
+      <li><strong>Public vs. private subnets</strong> — public subnets can route to the internet; private ones stay internal. Where something sits determines whether it's reachable from outside.</li>
+    </ul>
+    <div class="rf-eg">
+      <div class="eg-label">Why this matters for this module</div>
+      In EKS, <strong>pods get real IP addresses from your VPC subnets</strong> (via the VPC CNI). That makes pods first-class on the network — and means subnet size directly limits how many pods you can run. Subnet sizing becomes a cluster-capacity decision.
+    </div>
+
+    <h3>Security groups: stateful firewalls</h3>
+    <p>A <strong>security group</strong> is a virtual firewall attached to AWS resources, controlling inbound and outbound traffic by rules (port, protocol, source). EKS can even attach security groups to specific pods.</p>
+    <div class="rf-eg"><div class="eg-label">Example</div>A security group might allow inbound traffic on port 443 from anywhere, but database access only from the application's security group — not the whole internet.</div>
+
+    <h3>Load balancers: one front door for many pods</h3>
+    <p>A <strong>load balancer</strong> distributes incoming traffic across multiple backends. AWS offers two that matter here:</p>
+    <ul>
+      <li><strong>ALB (Application Load Balancer)</strong> — layer 7, understands HTTP/HTTPS, routes by path/host. Ideal for web traffic.</li>
+      <li><strong>NLB (Network Load Balancer)</strong> — layer 4, handles raw TCP/UDP at high throughput and low latency. Ideal for non-HTTP or performance-sensitive traffic.</li>
+    </ul>
+    <div class="rf-eg"><div class="eg-label">Why this matters for this module</div>The <strong>AWS Load Balancer Controller</strong> creates these load balancers automatically from your Kubernetes manifests — an ALB for an Ingress, an NLB for a LoadBalancer Service — instead of you wiring them by hand.</div>
+
+    <h3>Kubernetes Service and Ingress</h3>
+    <p>From Module 1's refresher: a <strong>Service</strong> gives a set of pods one stable address. Building on that:</p>
+    <ul>
+      <li><strong>Service type ClusterIP</strong> — reachable only inside the cluster (the default).</li>
+      <li><strong>Service type LoadBalancer</strong> — asks the platform to put an external load balancer (an NLB, via the controller) in front of the Service.</li>
+      <li><strong>Ingress</strong> — an HTTP/HTTPS routing layer: rules that map hostnames and paths to Services. With the controller, an Ingress provisions an ALB.</li>
+    </ul>
+    <div class="rf-eg"><div class="eg-label">Example</div>An Ingress rule "<code>shop.example.com/api → orders-service</code>" becomes ALB routing rules that send matching requests to the right pods.</div>
+
+    <p class="rf-bridge">So the toolkit for this module is: pods get <strong>VPC IPs</strong> (so subnet sizing matters), <strong>security groups</strong> and <strong>network policy</strong> govern who may talk to whom, and <strong>load balancers</strong> driven by <strong>Service</strong> and <strong>Ingress</strong> manifests bring outside traffic in. The four sections ahead — the VPC CNI, pod-to-pod policy, the Load Balancer Controller, and secure ingress — all answer one question: <em>how does traffic reach your pods, and how do you keep that path scoped and secure?</em></p>
+
+    <button class="refresh-close" onclick="toggleRefresh()">Close primer ▲</button>
+  </div>
+  </div>
+  </div>
+</div>
+
+<div class="section-pills-wrap">
+  <div class="section-pills" id="sectionPills">
+    <button class="section-pill active" data-sec="1" onclick="showSection(1)"><span class="pnum">1</span> The VPC CNI</button>
+    <button class="section-pill" data-sec="2" onclick="showSection(2)"><span class="pnum">2</span> Pod-to-pod &amp; network policy</button>
+    <button class="section-pill" data-sec="3" onclick="showSection(3)"><span class="pnum">3</span> Load Balancer Controller</button>
+    <button class="section-pill" data-sec="4" onclick="showSection(4)"><span class="pnum">4</span> Secure ingress</button>
+  </div>
+</div>
+
+<div class="main" id="sectionsRoot">
+  <!-- Sections injected by JS from SECTION_DATA -->
+</div>
+
+<div class="main" style="padding-top:0;">
+  <div class="bottom-nav">
+    <a class="nav-btn back" href="eks-dashboard.html">← Track dashboard</a>
+    <a class="nav-btn" href="eks-module-5.html">Module 5 — Operations →</a>
+  </div>
+</div>
+
+<footer>
+  EKS Skill Track · SourceFuse L&amp;D · <!-- TODO: skill-attainment tagline once naming convention is locked (e.g. "Completing this track attests EKS competency — not an internal certification.") -->
+  <span class="attrib">Best-practice guidance maps to the AWS Well-Architected Framework. Instructional scenarios and explanations are original content.</span>
+</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const _FB_CONFIG = {
+  apiKey: "AIzaSyC-I-IOCq2fCwa471fsD5xOn6SYQSBDp7Q",
+  authDomain: "sfcertification-grafana.firebaseapp.com",
+  projectId: "sfcertification-grafana",
+  storageBucket: "sfcertification-grafana.firebasestorage.app",
+  messagingSenderId: "227322696511",
+  appId: "1:227322696511:web:12e7ced7dd3d45fa06798a"
+};
+if (!window._fbApp) { window._fbApp = firebase.initializeApp(_FB_CONFIG); }
+const _auth = firebase.auth(window._fbApp);
+const _provider = new firebase.auth.GoogleAuthProvider();
+_provider.setCustomParameters({ hd: 'sourcefuse.com' });
+
+window.eksLearnerKey = function(sectionId) {
+  const uid = window._learnerUid || 'anon';
+  return 'eks_learner_' + uid + '_' + MODULE_ID + '_' + sectionId;
+};
+
+function showOverlay()   { document.getElementById('authOverlay')?.classList.remove('hidden'); }
+function hideOverlay()   { document.getElementById('authOverlay')?.classList.add('hidden'); }
+function showUserBar(email) {
+  const bar = document.getElementById('authUserBar');
+  const em  = document.getElementById('authUserEmail');
+  if (bar) bar.classList.remove('hidden');
+  if (em)  em.textContent = 'Welcome, ' + email;
+}
+
+_auth.onAuthStateChanged(function(user) {
+  if (user) {
+    const email = user.email || '';
+    if (!email.endsWith('@sourcefuse.com')) {
+      const errEl = document.getElementById('authError');
+      if (errEl) { errEl.textContent = 'Please use your @sourcefuse.com account.'; errEl.classList.remove('hidden'); }
+      _auth.signOut();
+      showOverlay();
+      return;
+    }
+    window._learnerUid   = user.uid;
+    window._learnerEmail = email;
+    hideOverlay();
+    showUserBar(email);
+    document.dispatchEvent(new Event('learnerReady'));
+  } else {
+    window._learnerUid   = null;
+    window._learnerEmail = null;
+    showOverlay();
+  }
+});
+
+document.getElementById('googleSignInBtn')?.addEventListener('click', function() {
+  _auth.signInWithPopup(_provider).catch(function(err) {
+    const el = document.getElementById('authError');
+    if (el) { el.textContent = err.message; el.classList.remove('hidden'); }
+  });
+});
+
+function eksEmailSignIn() {
+  const email = (document.getElementById('authEmail')?.value || '').trim().toLowerCase();
+  const pwd   =  document.getElementById('authPassword')?.value || '';
+  const el    =  document.getElementById('authError');
+  function fail(msg){ if(el){ el.textContent = msg; el.classList.remove('hidden'); } }
+  if (el) el.classList.add('hidden');
+  if (!email || !pwd) { fail('Please enter your email and password.'); return; }
+  if (!email.endsWith('@sourcefuse.com')) { fail('Only @sourcefuse.com accounts are allowed.'); return; }
+  _auth.signInWithEmailAndPassword(email, pwd).catch(function(err) {
+    const m = (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') ? 'Incorrect password.'
+            : (err.code === 'auth/user-not-found') ? 'No account found for this email.'
+            : err.message;
+    fail(m);
+  });
+}
+document.getElementById('emailSignInBtn')?.addEventListener('click', eksEmailSignIn);
+document.getElementById('authPassword')?.addEventListener('keydown', function(e){ if(e.key==='Enter') eksEmailSignIn(); });
+
+document.getElementById('authSignOutBtn')?.addEventListener('click', function() { _auth.signOut(); });
+</script>
+
+<!-- Question bank -->
+<script src="eks-question-bank.js"></script>
+
+<script>
+const CACHE_VERSION = '2026-06-10-v1';
+const MODULE_ID    = 'eks_m4';
+const SP_SKILL_ID  = 'eks';                    /* skillsProgress → skills.eks  (TODO: confirm slug when naming convention is locked) */
+const SP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
+const BANK_KEY     = 'm4';   // key into window.EKS_QUESTION_BANK
+
+console.log('%c[EKS Skill Track] eks-module-4.html — v' + CACHE_VERSION, 'color:#1a6eb5;font-weight:bold;');
+
+// ── Five tabs per section ──────────────────────────────────────────────
+//   1 Scenario (Set) · 2 Walkthrough (Learn) · 3 Best Practices (See)
+//   4 Lab (Do) · 5 Check Your Understanding (Self-Assess)
+const TAB_DEFS = [
+  { key:'scenario',  name:'Scenario',              verb:'Set' },
+  { key:'walkthrough', name:'Walkthrough',         verb:'Learn' },
+  { key:'best',      name:'Best Practices',        verb:'See' },
+  { key:'lab',       name:'Lab',                   verb:'Do' }
+  // 5th tab (Check Your Understanding / Self-Assess) is appended in code.
+];
+
+// ── Section teaching content ────────────────────────────────────────────────
+const SECTION_DATA = [
+  {
+    id: 's1', title: 'The VPC CNI',
+    scenario: {
+      heading: 'Pods that ran out of IP addresses',
+      html: `
+        <p class="prose"><strong>Naveen</strong>, a DevOps Engineer, deployed a new cluster into subnets a colleague had sized small — a few <code>/27</code> ranges left over from another project. It worked fine in testing. Then, as the team scaled workloads up, pods started getting stuck in <code>Pending</code> with no obvious resource shortage. The nodes had CPU and memory to spare.</p>
+        <p class="prose">The culprit: <strong>IP exhaustion</strong>. In EKS, every pod takes a real IP from the VPC subnets, and the small subnets simply ran out. Naveen needs to understand how the <strong>VPC CNI</strong> assigns pod IPs so he can size networks correctly and avoid this class of failure.</p>
+        <div class="callout"><strong>Why this matters:</strong> EKS pod networking is unusual — pods are first-class on your VPC. That's powerful, but it makes subnet sizing a real cluster-capacity decision, not an afterthought.</div>`
+    },
+    walkthrough: {
+      heading: 'Pods as first-class VPC citizens',
+      html: `
+        <p class="prose">The <strong>Amazon VPC CNI</strong> is the networking plugin EKS uses by default. Its defining behaviour: it assigns each pod an IP address <em>from your VPC subnets</em>. Pods aren't hidden behind an overlay network with translated addresses — they're routable on the VPC like any EC2 instance.</p>
+        <p class="prose"><strong>Why that's an advantage.</strong> Pods can be reached directly by other VPC resources, security groups can apply to them, and there's no overlay-network performance penalty or translation layer to debug. Traffic is native VPC traffic.</p>
+        <p class="prose"><strong>The constraint it creates.</strong> Because every pod consumes a VPC IP, the number of pods you can run is bounded by available subnet addresses. Each node pre-allocates a pool of IPs for its pods, so density and subnet size interact. Small subnets exhaust quickly — exactly what hit Naveen.</p>
+        <div class="example-block">
+          <div class="ex-label">The sizing reality, concretely</div>
+          A <code>/27</code> subnet has ~27 usable IPs. With pods each taking one (plus node and overhead IPs), a busy node can consume that in a single workload's scale-up. A cluster expecting hundreds of pods needs subnets sized accordingly — often <code>/20</code> or larger — or <strong>prefix delegation</strong> enabled so each node can address many more pods efficiently.
+        </div>
+        <p class="prose"><strong>Prefix delegation</strong> is the key mitigation: instead of assigning individual IPs one at a time, the CNI assigns each node a /28 prefix (a block of 16 addresses) at once, dramatically increasing pod density per node and using IP space more efficiently. For Naveen, the fix is to size subnets for expected density and enable prefix delegation.</p>
+        <div class="callout callout-good"><strong>The reframe:</strong> "out of IPs" isn't a Kubernetes bug — it's the natural consequence of pods being real VPC citizens. Plan CIDR space for pod density up front.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Reliability','Performance Efficiency','Operational Excellence'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Size VPC and subnet CIDRs for pod density</div>
+          <div class="bp-body">Plan IP space for the pods you expect to run, not just the nodes. Undersized subnets cause scheduling failures that look like mysterious capacity issues. <span class="wa-pillar">Reliability</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Enable prefix delegation for dense clusters</div>
+          <div class="bp-body">Prefix delegation lets each node address far more pods efficiently, increasing density and using IP space well. <span class="wa-pillar">Performance Efficiency</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Spread subnets across Availability Zones</div>
+          <div class="bp-body">Place node/pod subnets in multiple AZs so a single-AZ issue doesn't take out your data plane, and capacity is balanced. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Naveen hit:</strong> deploying into small leftover subnets, then hitting IP exhaustion under scale — a failure that's invisible until pod density grows.</div>`
+    },
+    lab: {
+      heading: 'Lab — inspect pod IPs and subnet capacity',
+      intro: `<p class="prose">You'll confirm pods carry real VPC IPs, check how much subnet space remains, and see where prefix delegation is configured. ~10 minutes, mostly inspection.</p>`,
+      steps: [
+        { t:'See that pods have VPC IPs', p:'The pod IPs fall within your VPC subnet ranges — they are real VPC addresses, not overlay addresses.',
+          code:`kubectl get pods -A -o wide\n<span class="cmt"># Note the IP column — these are addresses from your VPC subnets.</span>` },
+        { t:'Check the VPC CNI configuration', p:'The aws-node DaemonSet is the VPC CNI. Inspect its settings, including prefix delegation if enabled.',
+          code:`kubectl get daemonset aws-node -n kube-system\nkubectl describe daemonset aws-node -n kube-system | grep -i "ENABLE_PREFIX_DELEGATION\\|WARM" || echo "default IP assignment settings"` },
+        { t:'Inspect subnet IP capacity', p:'See how many addresses remain in the subnets your nodes/pods use.',
+          code:`aws ec2 describe-subnets --region ap-south-1 \\\n  --filters "Name=tag:kubernetes.io/cluster/sf-eks-lab,Values=shared,owned" \\\n  --query 'Subnets[].{Subnet:SubnetId,CIDR:CidrBlock,AvailableIPs:AvailableIpAddressCount}'` },
+        { t:'Note the density planning', p:'Compare available IPs against expected pod count. If tight, plan larger subnets or enable prefix delegation.',
+          code:`<span class="cmt"># Rule of thumb: each pod ~1 VPC IP. If AvailableIpAddressCount is</span>\n<span class="cmt"># near your expected pod count, you are at risk of exhaustion.</span>` }
+      ],
+      cleanup: `# Inspection only — nothing to clean up.`
+    }
+  },
+
+  {
+    id: 's2', title: 'Pod-to-pod & network policy',
+    scenario: {
+      heading: 'Every pod can reach the payments service',
+      html: `
+        <p class="prose"><strong>Reena</strong>, a DevOps Engineer, sits in on a security review. The reviewer asks a simple question: "Can a random pod in the cluster open a connection to the payments service?" The answer turns out to be yes — by default, any pod can talk to any other pod, across namespaces, with nothing stopping it.</p>
+        <p class="prose">That flat, open network means a single compromised pod can move laterally to sensitive services. Reena needs to understand the default networking model and how <strong>network policy</strong> (and security groups for pods) can segment traffic down to only what's needed.</p>
+        <div class="callout"><strong>Why this matters:</strong> Kubernetes networking is flat and permissive by default. Without explicit policy, "least privilege" stops at identity (Module 3) and never reaches the network — leaving lateral movement wide open.</div>`
+    },
+    walkthrough: {
+      heading: 'Default-open, and how to segment it',
+      html: `
+        <p class="prose">By default, Kubernetes networking is <strong>flat</strong>: every pod can reach every other pod, in any namespace, on any port the target listens on. There's no built-in segmentation. Namespaces organize resources but do <em>not</em> isolate network traffic on their own.</p>
+        <p class="prose">Two mechanisms let you restrict this on EKS:</p>
+        <p class="prose"><strong>Kubernetes NetworkPolicies.</strong> These declare which pods may talk to which, by label, namespace, and port. The VPC CNI now supports enforcing NetworkPolicies natively (or you can run a policy-capable CNI like Calico). A typical pattern: a default-deny policy, then explicit allows for legitimate traffic — so the payments service accepts connections only from the specific services that should reach it.</p>
+        <p class="prose"><strong>Security groups for pods.</strong> EKS can attach EC2 security groups directly to designated pods, bringing VPC-level firewall rules to pod traffic. This is useful when pods must integrate with security-group-based rules used elsewhere in your VPC (e.g. a database that only accepts its app's security group).</p>
+        <div class="example-block">
+          <div class="ex-label">Reena's fix, concretely</div>
+          Apply a default-deny NetworkPolicy in the <code>payments</code> namespace, then an allow rule permitting ingress only from the <code>checkout</code> service's pods on the payments port. Now a random compromised pod elsewhere simply can't open a connection to payments — the network refuses it.
+        </div>
+        <div class="callout callout-good"><strong>The reframe:</strong> identity (Module 3) controls what a workload can do in AWS; network policy controls who it can <em>talk to</em> in the cluster. Both are needed to contain a compromise.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Security','Operational Excellence'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Segment pod traffic with NetworkPolicies</div>
+          <div class="bp-body">Don't leave the network flat and open. Use NetworkPolicies (enforced by the VPC CNI or Calico) to allow only required pod-to-pod traffic, limiting lateral movement. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Default-deny, then allow explicitly</div>
+          <div class="bp-body">Start from a default-deny posture for sensitive namespaces and add explicit allow rules for legitimate flows, so anything unspecified is blocked. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Use security groups for pods where VPC rules apply</div>
+          <div class="bp-body">When pods must align with security-group-based controls elsewhere in the VPC, attach security groups to those pods for consistent, VPC-level enforcement. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Reena found:</strong> a flat network where any pod can reach the payments service — identity may be scoped, but the network isn't, leaving lateral movement open.</div>`
+    },
+    lab: {
+      heading: 'Lab — restrict pod-to-pod traffic',
+      intro: `<p class="prose">You'll confirm default-open connectivity, then apply a default-deny NetworkPolicy and an explicit allow, and verify traffic is segmented. ~15 minutes. Requires NetworkPolicy enforcement (VPC CNI network policy enabled, or Calico).</p>`,
+      steps: [
+        { t:'Show default-open connectivity', p:'Without policy, a pod in one namespace can reach a service in another.',
+          code:`kubectl create namespace payments\nkubectl run pay --image=nginx -n payments\nkubectl expose pod pay --port=80 -n payments\nkubectl run probe --image=busybox -- sleep 3600\n<span class="cmt"># From probe (default ns) reach payments — this succeeds by default:</span>\nkubectl exec probe -- wget -qO- --timeout=3 pay.payments.svc.cluster.local || echo "(if this connected, the network is flat)"` },
+        { t:'Apply a default-deny ingress policy', p:'Block all ingress to the payments namespace pods.',
+          code:`<span class="cmt"># deny-all.yaml</span>\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata: { name: default-deny-ingress, namespace: payments }\nspec:\n  podSelector: {}\n  policyTypes: ["Ingress"]\n<span class="cmt"># kubectl apply -f deny-all.yaml</span>` },
+        { t:'Confirm the probe is now blocked', p:'The same connection from the unrelated pod should now fail.',
+          code:`kubectl exec probe -- wget -qO- --timeout=3 pay.payments.svc.cluster.local || echo "blocked as expected — default-deny working"` },
+        { t:'Allow only the legitimate caller', p:'Add an allow rule for the specific source that should reach payments (by namespace/label).',
+          code:`<span class="cmt"># allow-checkout.yaml — permit ingress only from pods labelled app=checkout</span>\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata: { name: allow-checkout, namespace: payments }\nspec:\n  podSelector: {}\n  policyTypes: ["Ingress"]\n  ingress:\n    - from:\n        - podSelector: { matchLabels: { app: checkout } }` }
+      ],
+      cleanup: `kubectl delete namespace payments\nkubectl delete pod probe`
+    }
+  },
+
+  {
+    id: 's3', title: 'Load Balancer Controller',
+    scenario: {
+      heading: 'Load balancers wired by hand, drifting from the cluster',
+      html: `
+        <p class="prose"><strong>Imran</strong>, a DevOps Engineer, inherits an exposure setup where each public service has a load balancer someone created in the console and pointed at node ports by hand. When services change, the load balancer config doesn't — it drifts. Onboarding a new service means a manual checklist nobody fully trusts.</p>
+        <p class="prose">He's told the cluster should run the <strong>AWS Load Balancer Controller</strong>, which provisions and manages AWS load balancers directly from Kubernetes manifests. Imran needs to understand what it does so exposure becomes declarative instead of hand-wired.</p>
+        <div class="callout"><strong>Why this matters:</strong> hand-managed load balancers drift from the cluster they serve. Driving them from Kubernetes manifests keeps infrastructure in sync with the workloads and version-controllable.</div>`
+    },
+    walkthrough: {
+      heading: 'Load balancers driven by Kubernetes manifests',
+      html: `
+        <p class="prose">The <strong>AWS Load Balancer Controller</strong> runs in your cluster and watches Kubernetes Ingress and Service resources. When you create one, it provisions and configures the matching AWS load balancer for you — and keeps it in sync as the resource changes.</p>
+        <p class="prose">Two mappings are the core of it:</p>
+        <ul style="font-size:16px;color:var(--text-dim);line-height:1.8;margin:0 0 16px;padding-left:22px;">
+          <li><strong>Ingress → ALB.</strong> A Kubernetes <strong>Ingress</strong> (HTTP/HTTPS routing rules by host and path) provisions an <strong>Application Load Balancer</strong>. The controller translates your Ingress rules into ALB listener and routing rules.</li>
+          <li><strong>Service type LoadBalancer → NLB.</strong> A <strong>Service</strong> of type LoadBalancer provisions a <strong>Network Load Balancer</strong> for layer-4 TCP/UDP exposure.</li>
+        </ul>
+        <p class="prose">Because the load balancer is derived from a manifest, its configuration lives in version control alongside the workload, can be reviewed in a pull request, and never silently drifts from what the cluster actually serves. Add or change a route by editing the Ingress; the controller reconciles the ALB to match.</p>
+        <div class="example-block">
+          <div class="ex-label">Imran's shift, concretely</div>
+          <strong>Before:</strong> a console-created load balancer pointed at node ports by hand; changes tracked in someone's head.<br><br>
+          <strong>After:</strong> an Ingress manifest in git declares the routing; the controller provisions and maintains the ALB. New service = new Ingress rule in a PR, not a manual console session.
+        </div>
+        <div class="callout callout-good"><strong>The reframe:</strong> the controller makes load balancers a declarative, version-controlled extension of the cluster — exposure as code, not as a manual checklist.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Operational Excellence','Reliability'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Manage load balancers declaratively via the controller</div>
+          <div class="bp-body">Let Ingress/Service manifests drive ALB/NLB provisioning so load balancer config stays in sync with the cluster and lives in version control. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Choose ALB vs. NLB by traffic type</div>
+          <div class="bp-body">Use an ALB (Ingress) for HTTP/HTTPS routing by host/path; use an NLB (LoadBalancer Service) for high-throughput, low-latency TCP/UDP. Match the load balancer to the workload. <span class="wa-pillar">Reliability</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Reconcile, don't hand-edit</div>
+          <div class="bp-body">Change exposure by editing manifests and letting the controller reconcile, rather than editing the AWS load balancer directly — manual edits drift and get overwritten. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Imran is replacing:</strong> hand-created load balancers pointed at node ports, drifting from the cluster with every unsynced change.</div>`
+    },
+    lab: {
+      heading: 'Lab — expose a service via an ALB Ingress',
+      intro: `<p class="prose">You'll confirm the AWS Load Balancer Controller is installed, deploy a service, and create an Ingress that provisions an ALB. ~15 minutes (ALB provisioning takes a few minutes).</p>`,
+      steps: [
+        { t:'Confirm the controller is installed', p:'It runs in kube-system. If absent, it is installed via Helm/eksctl with an IRSA role (from Module 3) granting it ELB permissions.',
+          code:`kubectl get deployment -n kube-system aws-load-balancer-controller || echo "controller not installed — install via Helm with an IRSA role granting elasticloadbalancing permissions"` },
+        { t:'Deploy a sample app and Service', p:'A simple deployment fronted by a ClusterIP Service the Ingress will target.',
+          code:`kubectl create deployment demo --image=public.ecr.aws/nginx/nginx:latest\nkubectl expose deployment demo --port=80 --target-port=80` },
+        { t:'Create an Ingress to provision an ALB', p:'The alb annotations tell the controller to create an internet-facing ALB. It appears within a few minutes.',
+          code:`<span class="cmt"># ingress.yaml</span>\napiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: demo\n  annotations:\n    alb.ingress.kubernetes.io/scheme: internet-facing\n    alb.ingress.kubernetes.io/target-type: ip\nspec:\n  ingressClassName: alb\n  rules:\n    - http:\n        paths:\n          - path: /\n            pathType: Prefix\n            backend: { service: { name: demo, port: { number: 80 } } }\n<span class="cmt"># kubectl apply -f ingress.yaml</span>` },
+        { t:'Get the ALB address', p:'The controller populates the Ingress with the ALB DNS name once provisioned.',
+          code:`kubectl get ingress demo\n<span class="cmt"># ADDRESS column shows the ALB DNS name; curl it once it resolves.</span>` }
+      ],
+      cleanup: `kubectl delete ingress demo\nkubectl delete service demo\nkubectl delete deployment demo`
+    }
+  },
+
+  {
+    id: 's4', title: 'Secure ingress',
+    scenario: {
+      heading: 'An internal admin tool exposed to the internet',
+      html: `
+        <p class="prose"><strong>The team</strong> exposed an internal admin dashboard the same way they expose public services — an internet-facing load balancer, plain HTTP. It was the default they'd copied. A scan later flags it: the admin tool is reachable from the public internet, unencrypted.</p>
+        <p class="prose"><strong>Sunita</strong>, the DevOps Lead, wants every service exposed deliberately: public only when it must be, internal otherwise, and TLS everywhere. She needs to understand the levers — load balancer scheme, TLS termination, and load balancer type — to make exposure a conscious choice.</p>
+        <div class="callout"><strong>Why this matters:</strong> the controller makes exposing a service easy — which makes over-exposing one just as easy. Secure ingress is about consciously minimizing public surface and encrypting traffic.</div>`
+    },
+    walkthrough: {
+      heading: 'Exposing deliberately: scheme, TLS, and type',
+      html: `
+        <p class="prose">Once the Load Balancer Controller is in place, secure exposure comes down to a few deliberate choices on each Ingress or Service.</p>
+        <p class="prose"><strong>Scheme: internet-facing vs. internal.</strong> A load balancer can be <code>internet-facing</code> (reachable from the public internet) or <code>internal</code> (reachable only within the VPC/connected networks). Internal services — admin tools, internal APIs — should use <code>internal</code> so they're never publicly reachable. Only what genuinely must be public gets <code>internet-facing</code>.</p>
+        <p class="prose"><strong>TLS termination at the ALB.</strong> For HTTPS, terminate TLS at the ALB using a certificate from <strong>AWS Certificate Manager (ACM)</strong>. ACM provides managed, auto-renewing certificates, so traffic is encrypted in transit and you're not hand-managing certs in pods. The Ingress references the certificate via annotation.</p>
+        <p class="prose"><strong>Load balancer type by traffic.</strong> Use an ALB (Ingress) for HTTP/HTTPS where you want host/path routing and TLS termination. Use an NLB (LoadBalancer Service) for high-throughput, low-latency TCP/UDP workloads that don't need layer-7 features.</p>
+        <div class="example-block">
+          <div class="ex-label">Sunita's fixes, concretely</div>
+          <strong>Admin tool:</strong> change its Ingress to <code>scheme: internal</code> — now only reachable inside the VPC.<br><br>
+          <strong>All HTTP services:</strong> attach an ACM certificate and route HTTPS, redirecting HTTP→HTTPS, so nothing travels unencrypted.<br><br>
+          <strong>Public API:</strong> stays <code>internet-facing</code> but only because it must be — exposure is now a justified choice, not a copied default.
+        </div>
+        <div class="callout callout-good"><strong>The reframe:</strong> every exposed service should answer two questions on purpose — does this need to be public, and is its traffic encrypted? Internal-by-default and TLS-everywhere make those answers safe.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Security','Operational Excellence'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Default to internal; expose publicly only when required</div>
+          <div class="bp-body">Use <code>scheme: internal</code> for services that don't need public reach, minimizing internet-facing surface. Reserve <code>internet-facing</code> for what genuinely must be public. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Terminate TLS with ACM certificates</div>
+          <div class="bp-body">Encrypt traffic in transit by terminating TLS at the ALB with managed, auto-renewing ACM certificates, and redirect HTTP to HTTPS. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Pick the load balancer type deliberately</div>
+          <div class="bp-body">ALB for HTTP/HTTPS routing and TLS; NLB for high-throughput layer-4 traffic. Choosing on purpose keeps exposure efficient and appropriate. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Sunita is fixing:</strong> an internal admin tool exposed internet-facing over plain HTTP because that was the copied default — maximum surface, zero encryption.</div>`
+    },
+    lab: {
+      heading: 'Lab — make an Ingress internal and TLS-terminated',
+      intro: `<p class="prose">You'll take the Ingress from the previous section and harden it: switch an internal service to <code>internal</code> scheme and add ACM-based TLS to a public one. ~10–15 minutes. Requires an ACM certificate ARN in your sandbox for the TLS step.</p>`,
+      steps: [
+        { t:'Make an internal service internal', p:'Change the scheme so the load balancer is reachable only within the VPC.',
+          code:`<span class="cmt"># For an internal service's Ingress, set:</span>\n<span class="cmt">#   alb.ingress.kubernetes.io/scheme: internal</span>\nkubectl annotate ingress demo \\\n  alb.ingress.kubernetes.io/scheme=internal --overwrite\n<span class="cmt"># The ALB is recreated as internal; its DNS resolves to private addresses.</span>` },
+        { t:'Add TLS via an ACM certificate', p:'Reference an ACM cert so the ALB terminates HTTPS. Use a cert ARN from your sandbox account.',
+          code:`kubectl annotate ingress demo \\\n  alb.ingress.kubernetes.io/listen-ports='[{"HTTPS":443}]' \\\n  alb.ingress.kubernetes.io/certificate-arn='arn:aws:acm:ap-south-1:&lt;ACCOUNT_ID&gt;:certificate/&lt;CERT_ID&gt;' \\\n  --overwrite` },
+        { t:'Redirect HTTP to HTTPS', p:'Ensure no traffic stays on plain HTTP.',
+          code:`kubectl annotate ingress demo \\\n  alb.ingress.kubernetes.io/ssl-redirect='443' --overwrite` },
+        { t:'Verify the exposure posture', p:'Confirm scheme and TLS are as intended — internal where it should be, HTTPS where public.',
+          code:`kubectl describe ingress demo | grep -i "scheme\\|certificate\\|ssl-redirect"\n<span class="cmt"># Internal services: scheme internal. Public services: HTTPS with an ACM cert.</span>` }
+      ],
+      cleanup: `# If this was your last EKS lab, remove the demo resources and tear down the cluster:\n# kubectl delete ingress demo; kubectl delete service demo; kubectl delete deployment demo\n# eksctl delete cluster --name sf-eks-lab --region ap-south-1`
+    }
+  }
+];
+
+// ── Build section panels from data + question bank ───────────────────────────
+function bankFor(sectionKey) {
+  try { return (window.EKS_QUESTION_BANK[BANK_KEY] || {})[sectionKey] || []; }
+  catch(e) { return []; }
+}
+
+function buildSections() {
+  const root = document.getElementById('sectionsRoot');
+  SECTION_DATA.forEach(function(sec, idx) {
+    const secNum = idx + 1;
+    const questions = bankFor(sec.id);
+    const panel = document.createElement('section');
+    panel.className = 'section-panel' + (secNum === 1 ? ' active' : '');
+    panel.id = 'section-' + secNum;
+
+    // Tab buttons (4 teaching + 1 self-assess), each with verb-caption
+    let tabsBtns = '';
+    TAB_DEFS.forEach(function(t, ti) {
+      tabsBtns += '<button class="tab-btn' + (ti===0?' active':'') + '" onclick="showTab(' + secNum + ',' + (ti+1) + ')">'
+        + '<span class="num">' + (ti+1) + '</span>'
+        + '<span class="tab-caption-wrap"><span class="tab-name">' + t.name + '</span><span class="tab-verb">' + t.verb + '</span></span>'
+        + '</button>';
+    });
+    tabsBtns += '<button class="tab-btn" onclick="showTab(' + secNum + ',5)">'
+      + '<span class="num">5</span>'
+      + '<span class="tab-caption-wrap"><span class="tab-name">Check Your Understanding</span><span class="tab-verb">Self-Assess</span></span>'
+      + '</button>';
+
+    // Teaching panes
+    let panes = '';
+
+    // 1 — Scenario
+    panes += buildPane(secNum, 1, 'Scenario · Set', sec.scenario.heading, sec.scenario.html, 2);
+    // 2 — Walkthrough
+    panes += buildPane(secNum, 2, 'Walkthrough · Learn', sec.walkthrough.heading, sec.walkthrough.html, 3);
+    // 3 — Best Practices (with pillar legend)
+    let bestIntro = '';
+    if (sec.best.pillars && sec.best.pillars.length) {
+      bestIntro = '<div class="wa-legend">Well-Architected pillars in play: ' + sec.best.pillars.join(' · ') + '</div>';
+    }
+    panes += buildPane(secNum, 3, 'Best Practices · See', sec.best.heading, bestIntro + sec.best.html, 4);
+    // 4 — Lab
+    let labHtml = sec.lab.intro || '';
+    labHtml += '<div class="lab-caveat"><strong>⚠ Run in your own AWS sandbox only.</strong> These steps create real, billable AWS resources (EKS clusters, EC2 nodes, load balancers). Use a personal/sandbox account, follow the cleanup step at the end, and never run them against shared or production infrastructure.</div>';
+    sec.lab.steps.forEach(function(st, si) {
+      labHtml += '<div class="lab-step">'
+        + '<div class="lab-step-head"><span class="ls-num">' + (si+1) + '</span>' + st.t + '</div>'
+        + (st.p ? '<p>' + st.p + '</p>' : '')
+        + '<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>' + st.code + '</code></div>'
+        + '</div>';
+    });
+    if (sec.lab.cleanup) {
+      labHtml += '<div class="lab-cleanup"><strong>🧹 Clean up to avoid charges:</strong> when you\'re done, remove what you created.'
+        + '<div class="code-block" style="margin-top:10px;"><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>' + sec.lab.cleanup + '</code></div></div>';
+    }
+    panes += buildPane(secNum, 4, 'Lab · Do', sec.lab.heading, labHtml, 5);
+
+    // 5 — Check Your Understanding (quiz)
+    let qHtml = '';
+    questions.forEach(function(q, qi) {
+      let opts = '';
+      q.options.forEach(function(opt, oi) {
+        opts += '<label class="option"><input type="radio" name="s' + secNum + '_q' + (qi+1) + '" value="' + oi + '"> ' + opt + '</label>';
+      });
+      qHtml += '<div class="question-block">'
+        + '<div class="q-num">Question ' + (qi+1) + ' of ' + questions.length + '</div>'
+        + '<div class="q-text">' + q.q + '</div>'
+        + '<div class="options">' + opts + '</div>'
+        + '</div>';
+    });
+
+    panes += '<div class="tab-pane" id="pane-' + secNum + '-5">'
+      + '<div class="tab-label">Check Your Understanding · Self-Assess</div>'
+      + '<div class="tab-heading">Check your understanding</div>'
+      + '<div class="questions-wrap" id="questionsWrap-' + secNum + '">'
+      + '<p class="assessment-sub">Answer all ' + questions.length + ' questions to complete this section. Questions draw on all four tabs — including the Best Practices / Well-Architected mappings. Your answers are saved.</p>'
+      + qHtml
+      + '<button class="submit-btn" id="submitBtn-' + secNum + '" disabled>Submit answers</button>'
+      + '<div class="submit-note" id="submitNote-' + secNum + '">Select an answer for each question to submit.</div>'
+      + '</div>'
+      + '<div class="submitted-wrap hidden" id="submittedWrap-' + secNum + '">'
+      + '<div class="submitted-icon">✓</div><div class="submitted-title">Section complete</div>'
+      + '<div class="submitted-body">Your answers have been recorded and this section is marked complete.</div>'
+      + '<button class="ghost-btn redo-btn" id="redoBtn-' + secNum + '" style="margin-top:14px;">&#x21BA; Redo section</button>'
+      + '</div>'
+      + '</div>';
+
+    panel.innerHTML = '<div class="tabs-wrap"><div class="tabs">' + tabsBtns + '</div></div>'
+      + '<div class="tab-body">' + panes + '</div>';
+    root.appendChild(panel);
+  });
+}
+
+function buildPane(secNum, tabNum, label, heading, html, nextTab) {
+  const nav = '<div class="divider"></div><div class="tab-nav-row"><span></span>'
+    + '<button class="continue-btn" onclick="showTab(' + secNum + ',' + nextTab + ')">Continue →</button></div>';
+  return '<div class="tab-pane' + (tabNum===1?' active':'') + '" id="pane-' + secNum + '-' + tabNum + '">'
+    + '<div class="tab-label">' + label + '</div>'
+    + '<div class="tab-heading">' + heading + '</div>'
+    + html + nav + '</div>';
+}
+
+// ── Copy-to-clipboard for lab code blocks ────────────────────────────────────
+function copyCode(btn) {
+  const code = btn.parentElement.querySelector('code');
+  const text = code ? code.innerText : '';
+  navigator.clipboard.writeText(text).then(function(){
+    const orig = btn.textContent; btn.textContent = 'COPIED';
+    setTimeout(function(){ btn.textContent = orig; }, 1400);
+  }).catch(function(){ /* clipboard unavailable; no-op */ });
+}
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function toggleRefresh() {
+  var t = document.getElementById('refreshToggle');
+  var p = document.getElementById('refreshPanel');
+  if (!t || !p) return;
+  var open = p.classList.toggle('open');
+  t.classList.toggle('open', open);
+  var chev = t.querySelector('.rt-chev');
+  if (chev) chev.textContent = open ? '▲ CLOSE' : '▼ OPEN';
+}
+
+function showSection(n) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.section-pill').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + n)?.classList.add('active');
+  document.querySelector('.section-pill[data-sec="' + n + '"]')?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function showTab(sec, t) {
+  const panel = document.getElementById('section-' + sec);
+  if (!panel) return;
+  panel.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  panel.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  panel.querySelector('#pane-' + sec + '-' + t)?.classList.add('active');
+  panel.querySelectorAll('.tab-btn')[t-1]?.classList.add('active');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+function loadSec(secNum) {
+  const k = window.eksLearnerKey('s' + secNum);
+  try { return JSON.parse(localStorage.getItem(k)) || {}; } catch(e) { return {}; }
+}
+function saveSec(secNum, s) {
+  const k = window.eksLearnerKey('s' + secNum);
+  localStorage.setItem(k, JSON.stringify(s));
+}
+function allSectionsDone() {
+  for (let i = 1; i <= SECTION_DATA.length; i++) {
+    if (!loadSec(i).complete) return false;
+  }
+  return true;
+}
+function updateModuleProgress() {
+  let done = 0;
+  for (let i = 1; i <= SECTION_DATA.length; i++) {
+    if (loadSec(i).complete) {
+      done++;
+      document.querySelector('.section-pill[data-sec="' + i + '"]')?.classList.add('done');
+    }
+  }
+  const el = document.getElementById('moduleProgress');
+  if (el) el.textContent = done + ' of ' + SECTION_DATA.length + ' sections complete';
+  if (done >= SECTION_DATA.length) cpWriteModuleComplete();
+}
+
+function wireSection(secNum) {
+  const questions = bankFor('s' + secNum);
+  const qCount = questions.length;
+  const submitBtn = document.getElementById('submitBtn-' + secNum);
+  const note = document.getElementById('submitNote-' + secNum);
+
+  function checkAll() {
+    let answered = 0;
+    for (let i = 1; i <= qCount; i++) {
+      if (document.querySelector('input[name="s' + secNum + '_q' + i + '"]:checked')) answered++;
+    }
+    const all = answered === qCount;
+    if (submitBtn) submitBtn.disabled = !all;
+    if (note) note.textContent = all ? 'Ready to submit.' : 'Select an answer for each question to submit.';
+  }
+
+  document.querySelectorAll('#questionsWrap-' + secNum + ' input[type="radio"]').forEach(function(r) {
+    r.addEventListener('change', checkAll);
+  });
+
+  function showSubmitted() {
+    document.getElementById('questionsWrap-' + secNum)?.classList.add('hidden');
+    document.getElementById('submittedWrap-' + secNum)?.classList.remove('hidden');
+  }
+
+  if (submitBtn) submitBtn.addEventListener('click', function() {
+    const answers = {};
+    for (let i = 1; i <= qCount; i++) {
+      const v = document.querySelector('input[name="s' + secNum + '_q' + i + '"]:checked')?.value;
+      answers['q' + i] = v != null ? parseInt(v, 10) : null;
+    }
+    const correct = {};
+    questions.forEach(function(q, qi) { correct['q' + (qi+1)] = q.correctIndex; });
+    let score = 0;
+    for (let i = 1; i <= qCount; i++) { if (answers['q'+i] === correct['q'+i]) score++; }
+
+    const s = loadSec(secNum);
+    s.sectionId   = 's' + secNum;
+    s.answers     = answers;
+    s.correct     = correct;
+    s.score       = score;
+    s.total       = qCount;
+    s.submittedAt = new Date().toISOString();
+    s.complete    = true;
+    saveSec(secNum, s);
+
+    showSubmitted();
+    document.querySelector('.section-pill[data-sec="' + secNum + '"]')?.classList.add('done');
+    updateModuleProgress();
+  });
+
+  const redo = document.getElementById('redoBtn-' + secNum);
+  if (redo) redo.addEventListener('click', function() {
+    const k = window.eksLearnerKey('s' + secNum);
+    localStorage.removeItem(k);
+    document.getElementById('questionsWrap-' + secNum)?.classList.remove('hidden');
+    document.getElementById('submittedWrap-' + secNum)?.classList.add('hidden');
+    document.querySelectorAll('#questionsWrap-' + secNum + ' input[type="radio"]').forEach(function(r){ r.checked = false; });
+    if (submitBtn) submitBtn.disabled = true;
+    if (note) note.textContent = 'Select an answer for each question to submit.';
+    document.querySelector('.section-pill[data-sec="' + secNum + '"]')?.classList.remove('done');
+    updateModuleProgress();
+  });
+
+  // Restore submitted state
+  if (loadSec(secNum).submittedAt) showSubmitted();
+}
+
+document.addEventListener('learnerReady', function() {
+  cpEnsureModuleStarted();
+  for (let i = 1; i <= SECTION_DATA.length; i++) wireSection(i);
+  updateModuleProgress();
+});
+
+// ── skillsProgress (uid-keyed; skill → module map) ───────────────────────────
+// Separate from courseProgress: skills are "attained", not certified.
+//   skillsProgress/{uid} → { skills: { eks: { skillStartedOn, moduleInProgress,
+//     modules: { eks_m1: {startedOn, completedOn, timeTaken}, ... },
+//     skillAttainedOn } } }
+function spNow() {
+  var d = new Date(); var pad = function(n){ return String(n).padStart(2,'0'); };
+  return { date: d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),
+           time: pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()), ms: d.getTime() };
+}
+function spFmtDuration(ms) {
+  if (ms == null || ms < 0) return null;
+  var s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  if (h > 0) return h+'h '+m+'m '+sec+'s';
+  if (m > 0) return m+'m '+sec+'s';
+  return sec+'s';
+}
+function spDb() { return firebase.firestore(window._fbApp); }
+function spDocRef() { return spDb().collection('skillsProgress').doc(window._learnerUid); }
+function spReady() { return window._fbApp && window._learnerUid && window._learnerUid !== 'anon'; }
+
+function cpEnsureModuleStarted() {
+  if (!spReady()) return;
+  var ref = spDocRef();
+  ref.get().then(function(snap){
+    var data = snap.exists ? (snap.data() || {}) : {};
+    var skill = (data.skills && data.skills[SP_SKILL_ID]) || {};
+    var mods = skill.modules || {};
+    var t = spNow();
+    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, skills: {} };
+    update.skills[SP_SKILL_ID] = { moduleInProgress: MODULE_ID, modules: {} };
+    if (!skill.skillStartedOn) { update.skills[SP_SKILL_ID].skillStartedOn = t.date; update.skills[SP_SKILL_ID].skillStartedAt = t.time; }
+    if (!mods[MODULE_ID] || !mods[MODULE_ID].startedOn) {
+      update.skills[SP_SKILL_ID].modules[MODULE_ID] = { startedOn: t.date, startedAt: t.time };
+    }
+    ref.set(update, { merge: true }).catch(function(e){ console.warn('[skillsProgress] start write failed:', e.message); });
+  }).catch(function(e){ console.warn('[skillsProgress] start read failed:', e.message); });
+}
+
+function cpWriteModuleComplete() {
+  if (!spReady()) return;
+  var ref = spDocRef();
+  ref.get().then(function(snap){
+    var data = snap.exists ? (snap.data() || {}) : {};
+    var skill = (data.skills && data.skills[SP_SKILL_ID]) || {};
+    var mods = skill.modules || {};
+    if (mods[MODULE_ID] && mods[MODULE_ID].completedOn) return; // idempotent
+    var t = spNow();
+    var startMs = null, mEntry = mods[MODULE_ID];
+    if (mEntry && mEntry.startedOn && mEntry.startedAt) startMs = new Date(mEntry.startedOn + 'T' + mEntry.startedAt).getTime();
+    var moduleTimeTaken = startMs != null ? spFmtDuration(t.ms - startMs) : null;
+
+    var skillUpdate = { modules: {} };
+    skillUpdate.modules[MODULE_ID] = { completedOn: t.date, completedAt: t.time, timeTaken: moduleTimeTaken };
+    if (skill.moduleInProgress === MODULE_ID) skillUpdate.moduleInProgress = null;
+
+    var completedCount = 0;
+    SP_MODULE_IDS.forEach(function(id){
+      if (id === MODULE_ID) { completedCount++; return; }
+      if (mods[id] && mods[id].completedOn) completedCount++;
+    });
+    if (completedCount >= SP_MODULE_IDS.length && !skill.skillAttainedOn) {
+      skillUpdate.skillAttainedOn = t.date; skillUpdate.skillAttainedAt = t.time;
+      if (skill.skillStartedOn && skill.skillStartedAt) {
+        var sStart = new Date(skill.skillStartedOn + 'T' + skill.skillStartedAt).getTime();
+        skillUpdate.timeTaken = spFmtDuration(t.ms - sStart);
+      }
+    }
+    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, skills: {} };
+    update.skills[SP_SKILL_ID] = skillUpdate;
+    ref.set(update, { merge: true }).catch(function(e){ console.warn('[skillsProgress] complete write failed:', e.message); });
+  }).catch(function(e){ console.warn('[skillsProgress] complete read failed:', e.message); });
+}
+
+// Cache busting on internal links
+(function() {
+  function addVersion(url) {
+    if (!url || url.startsWith('http') || url.startsWith('#') || url.startsWith('mailto')) return url;
+    if (!url.endsWith('.html') && !url.includes('.html?')) return url;
+    const sep = url.includes('?') ? '&' : '?';
+    if (url.includes('v=' + CACHE_VERSION)) return url;
+    return url + sep + 'v=' + CACHE_VERSION;
+  }
+  document.querySelectorAll('a[href]').forEach(a => { a.href = addVersion(a.getAttribute('href')); });
+})();
+
+// Build panels immediately (content is static; auth gates the overlay only)
+buildSections();
+</script>
+
+</body>
+</html>
