@@ -261,7 +261,7 @@
 
   <div class="refresh-panel" id="refreshPanel">
     <h3>The compute foundations this module builds on</h3>
-    <p>Module 1 established that in EKS <strong>you own the worker nodes</strong> — the machines your pods run on. This module is entirely about <em>those machines</em>: what they are, how AWS can manage them for you, and how their number flexes with demand. A few cloud-compute fundamentals make all of it click.</p>
+    <p>In EKS, <strong>you own the worker nodes</strong> — the machines your pods run on. This module is entirely about <em>those machines</em>: what they are, how AWS can manage them for you, and how their number flexes with demand. A few cloud-compute fundamentals make all of it click.</p>
 
     <h3>What a "node" actually is on AWS</h3>
     <p>A Kubernetes <strong>worker node</strong> is just a machine that runs your pods. On AWS, that machine is most often an <strong>EC2 instance</strong> — a virtual server you rent by the second. Each instance has a <strong>type</strong> (e.g. <code>t3.medium</code>) that fixes its CPU and memory.</p>
@@ -406,7 +406,7 @@ document.getElementById('authSignOutBtn')?.addEventListener('click', function() 
 <script src="eks-question-bank.js"></script>
 
 <script>
-const CACHE_VERSION = '2026-06-10-v1';
+const CACHE_VERSION = '2026-06-10-v2';
 const MODULE_ID    = 'eks_m2';
 const SP_SKILL_ID  = 'eks';                    /* skillsProgress → skills.eks  (TODO: confirm slug when naming convention is locked) */
 const SP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
