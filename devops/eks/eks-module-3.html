@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3 — Identity: IRSA & Pod Identity · EKS Skill Track</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@300;400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#eef2f7; --bg2:#ffffff; --bg3:#f0f4f9; --border:#d0dae8;
+    --text:#1a2332; --text-dim:#4a5568; --text-dimmer:#8fa3bc;
+    --blue:#1a6eb5; --blue-light:#e8f1fb; --blue-mid:#b8d0ed; --blue-dark:#0f4a7a;
+    --pm:#1a6eb5; --pm-light:#e8f1fb; --pm-mid:#b8d0ed; --pm-dark:#0f4a7a;
+    --coral:#c0392b; --coral-light:#fdf0ee; --coral-mid:#f0b8b2;
+    --green:#1a6b3a; --green-light:#e8f5ed; --green-mid:#a3d4b8;
+    --amber:#92600a; --amber-light:#fdf3e3; --amber-mid:#e8cf9a;
+    --code-bg:#1e2433; --code-text:#cdd6f4; --radius:12px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Merriweather Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+  .topnav { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; height:52px; display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:var(--text-dim); }
+  .topnav a { color:var(--pm); text-decoration:none; }
+  .topnav a:hover { text-decoration:underline; }
+  .sep { opacity:.4; }
+
+  /* Module header band */
+  .module-band { background:var(--bg2); border-bottom:1px solid var(--border); padding:24px 40px; }
+  .module-eyebrow { font-size:13px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+  .module-title { font-size:26px; font-weight:700; color:var(--text); }
+  .module-progress { font-size:13px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); margin-top:10px; }
+
+  /* Refresher primer */
+  .refresh-wrap { max-width:1100px; margin:18px auto 0; padding:0 32px; }
+  .refresh-toggle { width:100%; display:flex; align-items:center; gap:12px; padding:16px 20px; background:var(--blue-light); border:1.5px solid var(--blue-mid); border-left:3px solid var(--blue); border-radius:var(--radius); cursor:pointer; font-family:'Merriweather Sans',sans-serif; font-size:15.5px; font-weight:700; color:var(--blue-dark); text-align:left; transition:background .15s; }
+  .refresh-toggle:hover { background:var(--blue-light); border-color:var(--blue); }
+  .refresh-toggle .rt-icon { font-size:20px; flex-shrink:0; }
+  .refresh-toggle .rt-text { flex:1; }
+  .refresh-toggle .rt-sub { display:block; font-weight:400; font-size:13px; color:var(--text-dim); margin-top:3px; }
+  .refresh-toggle .rt-chev { font-size:13px; font-family:'Source Code Pro',monospace; transition:transform .2s; flex-shrink:0; }
+  .refresh-toggle.open .rt-chev { transform:rotate(180deg); }
+  .refresh-panel { display:none; margin-top:14px; background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--radius); padding:30px 34px; animation:fadeIn .25s ease; }
+  .refresh-panel.open { display:block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+  .refresh-panel h3 { font-size:20px; font-weight:700; color:var(--text); margin:26px 0 10px; }
+  .refresh-panel h3:first-child { margin-top:0; }
+  .refresh-panel h4 { font-size:16px; font-weight:700; color:var(--blue-dark); margin:18px 0 6px; }
+  .refresh-panel p { font-size:16px; color:var(--text-dim); line-height:1.8; margin-bottom:12px; }
+  .refresh-panel p strong { color:var(--text); font-weight:600; }
+  .refresh-panel ul { margin:0 0 14px; padding-left:22px; }
+  .refresh-panel li { font-size:15.5px; color:var(--text-dim); line-height:1.75; margin-bottom:8px; }
+  .refresh-panel li strong { color:var(--text); font-weight:600; }
+  .rf-eg { border-left:3px solid var(--green); background:var(--green-light); padding:12px 16px; border-radius:0 8px 8px 0; margin:8px 0 16px; font-size:14.5px; line-height:1.7; color:var(--text-dim); }
+  .rf-eg .eg-label { font-size:11px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--green); margin-bottom:5px; }
+  .rf-eg strong { color:var(--text); }
+  .rf-table { width:100%; border-collapse:collapse; margin:8px 0 4px; }
+  .rf-table th, .rf-table td { text-align:left; padding:10px 14px; border:1px solid var(--border); font-size:14.5px; vertical-align:top; }
+  .rf-table th { background:var(--bg3); font-weight:700; color:var(--text); }
+  .rf-table td { color:var(--text-dim); line-height:1.65; }
+  .rf-bridge { font-size:16px; color:var(--text-dim); line-height:1.8; margin:6px 0 18px; padding:14px 18px; background:var(--bg3); border-radius:8px; }
+  .rf-bridge strong { color:var(--text); font-weight:600; }
+  .refresh-close { margin-top:20px; padding:10px 20px; background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .refresh-close:hover { background:var(--bg3); }
+
+  /* Section pills */
+  .section-pills-wrap { background:var(--bg2); border-bottom:1px solid var(--border); padding:0 40px; overflow-x:auto; }
+  .section-pills { display:flex; gap:0; }
+  .section-pill {
+    display:flex; align-items:center; gap:8px; padding:14px 18px;
+    font-size:15px; font-weight:700; color:var(--text-dimmer);
+    border-bottom:2px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none;
+    white-space:nowrap; transition:color .15s; font-family:'Merriweather Sans',sans-serif;
+  }
+  .section-pill .pnum {
+    width:26px; height:26px; border-radius:50%; background:var(--bg3); border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;
+    font-family:'Source Code Pro',monospace; flex-shrink:0; transition:all .15s;
+  }
+  .section-pill.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .section-pill.active .pnum { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .section-pill.done .pnum { background:var(--green); border-color:var(--green); color:#fff; }
+
+  .main { max-width:1100px; margin:0 auto; padding:32px; }
+
+  /* Section panel */
+  .section-panel { display:none; }
+  .section-panel.active { display:block; }
+
+  /* Tab row (within a section) */
+  .tabs-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; padding:0 8px; overflow-x:auto; }
+  .tabs { display:flex; gap:0; }
+  .tab-btn {
+    display:flex; align-items:center; gap:9px; padding:12px 16px;
+    font-size:14.5px; font-weight:700; color:var(--text-dimmer);
+    border-bottom:2px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none;
+    white-space:nowrap; transition:color .15s; font-family:'Merriweather Sans',sans-serif;
+  }
+  .tab-btn .num { width:24px; height:24px; border-radius:50%; background:var(--bg3); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; font-family:'Source Code Pro',monospace; flex-shrink:0; transition:all .15s; }
+  .tab-btn .tab-caption-wrap { display:flex; flex-direction:column; align-items:flex-start; line-height:1.15; }
+  .tab-btn .tab-name { font-size:14.5px; }
+  .tab-btn .tab-verb { font-size:10.5px; font-family:'Source Code Pro',monospace; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dimmer); margin-top:2px; }
+  .tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .tab-btn.active .num { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .tab-btn.active .tab-verb { color:var(--blue); }
+
+  .tab-body { background:var(--bg2); border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); padding:32px; }
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
+
+  .tab-label { font-size:13px; font-family:'Source Code Pro',monospace; font-weight:700; color:var(--blue); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+  .tab-heading { font-size:23px; font-weight:700; margin-bottom:18px; }
+
+  .prose { font-size:16.5px; color:var(--text-dim); line-height:1.85; margin-bottom:18px; }
+  .prose strong { color:var(--text); font-weight:600; }
+  .prose code, .inline-code { font-family:'Source Code Pro',monospace; font-size:0.88em; background:var(--bg3); border:1px solid var(--border); border-radius:5px; padding:1px 6px; color:var(--blue-dark); }
+
+  .callout { border-left:3px solid var(--blue); background:var(--blue-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; line-height:1.7; color:var(--text-dim); }
+  .callout-warn { border-left-color:var(--amber); background:var(--amber-light); }
+  .callout-bad  { border-left-color:var(--coral); background:var(--coral-light); }
+  .callout-good { border-left-color:var(--green); background:var(--green-light); }
+  .callout strong { color:var(--text); }
+
+  .example-block { background:var(--bg3); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin:18px 0; font-size:15.5px; line-height:1.8; color:var(--text-dim); }
+  .example-block .ex-label { font-size:12px; font-family:'Source Code Pro',monospace; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px; }
+
+  /* Well-Architected pillar tags */
+  .wa-pillar { display:inline-flex; align-items:center; gap:6px; font-family:'Source Code Pro',monospace; font-size:11.5px; font-weight:600; letter-spacing:.04em; padding:4px 10px; border-radius:20px; border:1.5px solid var(--blue-mid); background:var(--blue-light); color:var(--blue-dark); margin:0 6px 8px 0; }
+  .wa-pillar::before { content:"▲"; font-size:9px; }
+  .wa-legend { font-size:13px; color:var(--text-dimmer); font-family:'Source Code Pro',monospace; margin:2px 0 14px; }
+  .bp-item { margin:0 0 18px; }
+  .bp-item .bp-head { font-size:16.5px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .bp-item .bp-body { font-size:15.5px; color:var(--text-dim); line-height:1.8; }
+  .bp-item .bp-body strong { color:var(--text); }
+
+  /* Lab tab */
+  .lab-caveat { border-left:3px solid var(--amber); background:var(--amber-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:0 0 22px; font-size:14px; line-height:1.7; color:var(--text-dim); }
+  .lab-caveat strong { color:var(--text); }
+  .lab-step { margin:0 0 22px; }
+  .lab-step-head { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .lab-step-head .ls-num { width:24px; height:24px; border-radius:50%; background:var(--blue); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; font-family:'Source Code Pro',monospace; flex-shrink:0; }
+  .lab-step p { font-size:15px; color:var(--text-dim); line-height:1.75; margin-bottom:10px; }
+  .code-block { position:relative; background:var(--code-bg); color:var(--code-text); border-radius:10px; padding:16px 18px; margin:10px 0 6px; font-family:'Source Code Pro',monospace; font-size:13.5px; line-height:1.7; overflow-x:auto; white-space:pre; }
+  .code-block .copy-btn { position:absolute; top:10px; right:10px; background:rgba(255,255,255,.12); color:#cdd6f4; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-family:'Source Code Pro',monospace; font-weight:600; cursor:pointer; letter-spacing:.05em; }
+  .code-block .copy-btn:hover { background:rgba(255,255,255,.22); }
+  .code-block .cmt { color:#8fa3bc; }
+  .lab-cleanup { border-left:3px solid var(--coral); background:var(--coral-light); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0 0; font-size:14px; line-height:1.7; color:var(--text-dim); }
+  .lab-cleanup strong { color:var(--text); }
+
+  .divider { height:1px; background:var(--border); margin:26px 0; }
+  .tab-nav-row { display:flex; justify-content:space-between; margin-top:24px; }
+  .continue-btn { padding:11px 22px; background:var(--blue); color:#fff; border:none; border-radius:8px; font-size:14.5px; font-weight:700; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; }
+  .continue-btn:hover { background:var(--blue-dark); }
+  .ghost-btn { padding:11px 20px; background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .ghost-btn:hover { background:var(--bg3); }
+  .ghost-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+  /* Assessment */
+  .assessment-sub { font-size:14.5px; color:var(--text-dim); line-height:1.7; margin-bottom:22px; }
+  .question-block { margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--border); }
+  .question-block:last-of-type { border-bottom:none; }
+  .q-num { font-size:11px; font-family:'Source Code Pro',monospace; color:var(--blue); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; font-weight:600; }
+  .q-text { font-size:15.5px; font-weight:600; color:var(--text); line-height:1.5; margin-bottom:14px; }
+  .options { display:flex; flex-direction:column; gap:10px; }
+  .option { display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border-radius:8px; border:1.5px solid var(--border); cursor:pointer; font-size:14.5px; color:var(--text-dim); line-height:1.5; transition:border-color .15s, background .15s; }
+  .option:hover { border-color:var(--blue-mid); background:var(--blue-light); }
+  .option input[type="radio"] { margin-top:3px; flex-shrink:0; accent-color:var(--blue); }
+  .submit-btn { margin-top:18px; padding:12px 28px; background:var(--blue); color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; }
+  .submit-btn:disabled { background:var(--border); color:var(--text-dimmer); cursor:not-allowed; }
+  .submit-btn:not(:disabled):hover { background:var(--blue-dark); }
+  .submit-note { font-size:13px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); margin-top:8px; }
+  .submitted-wrap { text-align:center; padding:16px 0; }
+  .submitted-icon { font-size:34px; color:var(--green); margin-bottom:6px; }
+  .submitted-title { font-size:17px; font-weight:700; color:var(--green); margin-bottom:8px; }
+  .submitted-body { font-size:14.5px; color:var(--text-dim); line-height:1.7; }
+
+  .hidden { display:none !important; }
+
+  .bottom-nav { display:flex; justify-content:space-between; padding:28px 0 0; border-top:1px solid var(--border); margin-top:32px; }
+  .nav-btn { padding:12px 20px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; text-decoration:none; font-family:'Merriweather Sans',sans-serif; background:var(--blue); color:#fff; border:none; }
+  .nav-btn:hover { background:var(--blue-dark); }
+  .nav-btn.back { background:var(--bg2); color:var(--text-dim); border:1.5px solid var(--border); }
+
+  footer { text-align:center; padding:26px 32px; font-size:11px; font-family:'Source Code Pro',monospace; color:var(--text-dimmer); border-top:1px solid var(--border); line-height:1.7; }
+  footer .attrib { display:block; margin-top:6px; opacity:.85; font-style:italic; }
+
+  /* Auth */
+  .auth-overlay { position:fixed; inset:0; background:rgba(15,30,60,.7); display:flex; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(4px); }
+  .auth-overlay.hidden { display:none; }
+  .auth-box { background:#fff; border-radius:16px; padding:48px 40px; max-width:420px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+  .auth-logo { font-size:32px; margin-bottom:16px; }
+  .auth-title { font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .auth-sub { font-size:15px; color:var(--text-dim); line-height:1.6; margin-bottom:28px; }
+  .auth-google-btn { display:flex; align-items:center; justify-content:center; gap:12px; width:100%; padding:14px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; }
+  .auth-google-btn:hover { background:var(--blue-dark); }
+  .auth-google-btn svg { width:20px; height:20px; flex-shrink:0; }
+  .auth-divider { display:flex; align-items:center; gap:10px; margin:16px 0 14px; color:var(--text-dimmer); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  .auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .auth-input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:10px; outline:none; font-family:'Merriweather Sans',sans-serif; color:var(--text); background:#fff; display:block; }
+  .auth-input:focus { border-color:var(--blue); }
+  .auth-email-btn { display:block; width:100%; padding:14px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; font-family:'Merriweather Sans',sans-serif; transition:background .15s; margin-top:2px; }
+  .auth-email-btn:hover { background:var(--blue-dark); }
+  .auth-error { font-size:13px; color:var(--coral); margin-top:12px; font-family:'Source Code Pro',monospace; }
+  .auth-user-bar { background:var(--blue-light); border-bottom:1px solid var(--blue-mid); padding:8px 32px; font-size:13px; font-family:'Source Code Pro',monospace; color:var(--blue-dark); display:flex; align-items:center; justify-content:space-between; }
+  .auth-user-bar.hidden { display:none; }
+  .auth-signout { background:var(--blue); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:700; font-family:'Merriweather Sans',sans-serif; padding:8px 18px; text-decoration:none; }
+
+  @media(max-width:640px) { .topnav,.main,.module-band { padding-left:18px; padding-right:18px; } .section-pills-wrap { padding-left:14px; } .tab-body { padding:22px 18px; } }
+</style>
+</head>
+<body>
+
+<!-- Auth overlay -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">☸️</div>
+    <div class="auth-title">EKS Skill Track</div>
+    <div class="auth-sub">Sign in with your SourceFuse account to access the track and save your progress.</div>
+    <button class="auth-google-btn" id="googleSignInBtn">
+      <svg viewBox="0 0 48 48"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="auth-divider">OR</div>
+    <input type="email" class="auth-input" id="authEmail" placeholder="you@sourcefuse.com" autocomplete="email">
+    <input type="password" class="auth-input" id="authPassword" placeholder="Password" autocomplete="current-password">
+    <button class="auth-email-btn" id="emailSignInBtn">Sign in with Email</button>
+    <div class="auth-error hidden" id="authError"></div>
+  </div>
+</div>
+
+<div class="auth-user-bar hidden" id="authUserBar">
+  <span id="authUserEmail"></span>
+  <button class="auth-signout" id="authSignOutBtn">Sign out</button>
+</div>
+
+<nav class="topnav">
+  <a href="eks-dashboard.html">Back to track dashboard</a>
+  <span class="sep">/</span>
+  <span>Module 1</span>
+  <span class="sep">/</span>
+  <span>Identity: IRSA &amp; Pod Identity</span>
+</nav>
+
+<div class="module-band">
+  <div class="module-eyebrow">Module 3 of 5</div>
+  <div class="module-title">Identity: IRSA &amp; Pod Identity</div>
+  <div class="module-progress" id="moduleProgress">0 of 4 sections complete</div>
+</div>
+
+<div class="refresh-wrap">
+  <button class="refresh-toggle" id="refreshToggle" onclick="toggleRefresh()">
+    <span class="rt-icon">💡</span>
+    <span class="rt-text">Do you want to refresh your knowledge of AWS IAM &amp; identity?
+      <span class="rt-sub">A quick primer on IAM roles, policies, temporary credentials, and Kubernetes service accounts — open it if the identity material feels fast-paced.</span>
+    </span>
+    <span class="rt-chev">▼ OPEN</span>
+  </button>
+
+  <div class="refresh-panel" id="refreshPanel">
+    <h3>The identity foundations this module builds on</h3>
+    <p>This module is about giving a pod permission to call AWS services — read an S3 bucket, write to DynamoDB — <em>without</em> handing it a static password. To see how that works, you need two ideas side by side: how <strong>AWS IAM</strong> grants permissions, and what a <strong>Kubernetes service account</strong> is. IRSA and Pod Identity are bridges between the two.</p>
+
+    <h3>IAM: users, roles, and policies</h3>
+    <p><strong>AWS IAM (Identity and Access Management)</strong> decides who can do what in your AWS account. Three terms matter here:</p>
+    <ul>
+      <li><strong>Policy</strong> — a document listing allowed (or denied) actions on resources, e.g. "allow <code>s3:GetObject</code> on <code>my-bucket</code>." Permissions are expressed as policies.</li>
+      <li><strong>User</strong> — a long-lived identity with its own credentials. Useful for humans; awkward for workloads, because its credentials are long-lived secrets.</li>
+      <li><strong>Role</strong> — an identity with policies attached but <em>no</em> permanent credentials. Instead, a trusted party <strong>assumes</strong> the role and receives temporary, auto-expiring credentials.</li>
+    </ul>
+    <div class="rf-eg">
+      <div class="eg-label">Analogy</div>
+      An IAM <strong>user</strong> is like your own house key — yours permanently, and a problem if it's copied. A <strong>role</strong> is like a hotel keycard: issued to whoever is checked in, scoped to certain doors, and it expires on its own. Workloads should use keycards, not house keys.
+    </div>
+
+    <h3>Temporary credentials and "assuming" a role</h3>
+    <p>The power of a role is <strong>AssumeRole</strong>: a trusted identity exchanges its own proof-of-identity for <strong>short-lived credentials</strong> for the role. Those credentials expire automatically, so there's no long-lived secret to leak or rotate. This is the mechanism IRSA and Pod Identity use to get AWS credentials into a pod safely.</p>
+    <div class="rf-eg"><div class="eg-label">Example</div>Instead of storing an access key in a pod forever, the pod proves who it is and receives credentials that work for, say, an hour — then automatically gets fresh ones. Nothing permanent ever sits in the pod.</div>
+
+    <h3>Kubernetes service accounts</h3>
+    <p>Inside Kubernetes, a <strong>service account</strong> is the identity a pod runs as — distinct from human users. By default pods get a service account, and that account can be associated with permissions. Crucially, a pod's service account can carry a <strong>projected token</strong> proving its identity to outside systems.</p>
+    <div class="rf-eg">
+      <div class="eg-label">Why this matters for this module</div>
+      IRSA and Pod Identity both work by linking a <strong>Kubernetes service account</strong> to an <strong>IAM role</strong>. The pod runs as the service account; the platform exchanges the service account's token for temporary IAM credentials for the linked role. That's the whole trick — service account in, scoped temporary AWS credentials out.
+    </div>
+
+    <h3>The node role — and why it's too broad</h3>
+    <p>Every worker node has its own IAM role. Without IRSA or Pod Identity, pods can end up using <em>the node's</em> role — meaning every pod on that node shares the same broad permissions. That's the problem this module solves: replacing one shared node-level identity with a scoped identity per workload.</p>
+    <div class="rf-eg"><div class="eg-label">Example</div>If the node role can read every S3 bucket, then any pod on that node can too — including one that should only touch a single bucket. Per-workload roles fix exactly this.</div>
+
+    <p class="rf-bridge">So the toolkit for this module is: IAM <strong>roles</strong> carry permissions via <strong>policies</strong> and are <strong>assumed</strong> for <strong>short-lived credentials</strong>; Kubernetes <strong>service accounts</strong> are the in-cluster identity a pod runs as; and today many pods over-inherit the broad <strong>node role</strong>. The four sections ahead — why static keys are bad, IRSA, EKS Pod Identity, and least-privilege role design — all answer one question: <em>how do we give each workload exactly the AWS access it needs, with credentials that expire on their own?</em></p>
+
+    <button class="refresh-close" onclick="toggleRefresh()">Close primer ▲</button>
+  </div>
+  </div>
+</div>
+
+<div class="section-pills-wrap">
+  <div class="section-pills" id="sectionPills">
+    <button class="section-pill active" data-sec="1" onclick="showSection(1)"><span class="pnum">1</span> The static-credentials problem</button>
+    <button class="section-pill" data-sec="2" onclick="showSection(2)"><span class="pnum">2</span> IRSA</button>
+    <button class="section-pill" data-sec="3" onclick="showSection(3)"><span class="pnum">3</span> EKS Pod Identity</button>
+    <button class="section-pill" data-sec="4" onclick="showSection(4)"><span class="pnum">4</span> Least-privilege access</button>
+  </div>
+</div>
+
+<div class="main" id="sectionsRoot">
+  <!-- Sections injected by JS from SECTION_DATA -->
+</div>
+
+<div class="main" style="padding-top:0;">
+  <div class="bottom-nav">
+    <a class="nav-btn back" href="eks-dashboard.html">← Track dashboard</a>
+    <a class="nav-btn" href="eks-module-4.html">Module 4 — Networking →</a>
+  </div>
+</div>
+
+<footer>
+  EKS Skill Track · SourceFuse L&amp;D · <!-- TODO: skill-attainment tagline once naming convention is locked (e.g. "Completing this track attests EKS competency — not an internal certification.") -->
+  <span class="attrib">Best-practice guidance maps to the AWS Well-Architected Framework. Instructional scenarios and explanations are original content.</span>
+</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const _FB_CONFIG = {
+  apiKey: "AIzaSyC-I-IOCq2fCwa471fsD5xOn6SYQSBDp7Q",
+  authDomain: "sfcertification-grafana.firebaseapp.com",
+  projectId: "sfcertification-grafana",
+  storageBucket: "sfcertification-grafana.firebasestorage.app",
+  messagingSenderId: "227322696511",
+  appId: "1:227322696511:web:12e7ced7dd3d45fa06798a"
+};
+if (!window._fbApp) { window._fbApp = firebase.initializeApp(_FB_CONFIG); }
+const _auth = firebase.auth(window._fbApp);
+const _provider = new firebase.auth.GoogleAuthProvider();
+_provider.setCustomParameters({ hd: 'sourcefuse.com' });
+
+window.eksLearnerKey = function(sectionId) {
+  const uid = window._learnerUid || 'anon';
+  return 'eks_learner_' + uid + '_' + MODULE_ID + '_' + sectionId;
+};
+
+function showOverlay()   { document.getElementById('authOverlay')?.classList.remove('hidden'); }
+function hideOverlay()   { document.getElementById('authOverlay')?.classList.add('hidden'); }
+function showUserBar(email) {
+  const bar = document.getElementById('authUserBar');
+  const em  = document.getElementById('authUserEmail');
+  if (bar) bar.classList.remove('hidden');
+  if (em)  em.textContent = 'Welcome, ' + email;
+}
+
+_auth.onAuthStateChanged(function(user) {
+  if (user) {
+    const email = user.email || '';
+    if (!email.endsWith('@sourcefuse.com')) {
+      const errEl = document.getElementById('authError');
+      if (errEl) { errEl.textContent = 'Please use your @sourcefuse.com account.'; errEl.classList.remove('hidden'); }
+      _auth.signOut();
+      showOverlay();
+      return;
+    }
+    window._learnerUid   = user.uid;
+    window._learnerEmail = email;
+    hideOverlay();
+    showUserBar(email);
+    document.dispatchEvent(new Event('learnerReady'));
+  } else {
+    window._learnerUid   = null;
+    window._learnerEmail = null;
+    showOverlay();
+  }
+});
+
+document.getElementById('googleSignInBtn')?.addEventListener('click', function() {
+  _auth.signInWithPopup(_provider).catch(function(err) {
+    const el = document.getElementById('authError');
+    if (el) { el.textContent = err.message; el.classList.remove('hidden'); }
+  });
+});
+
+function eksEmailSignIn() {
+  const email = (document.getElementById('authEmail')?.value || '').trim().toLowerCase();
+  const pwd   =  document.getElementById('authPassword')?.value || '';
+  const el    =  document.getElementById('authError');
+  function fail(msg){ if(el){ el.textContent = msg; el.classList.remove('hidden'); } }
+  if (el) el.classList.add('hidden');
+  if (!email || !pwd) { fail('Please enter your email and password.'); return; }
+  if (!email.endsWith('@sourcefuse.com')) { fail('Only @sourcefuse.com accounts are allowed.'); return; }
+  _auth.signInWithEmailAndPassword(email, pwd).catch(function(err) {
+    const m = (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') ? 'Incorrect password.'
+            : (err.code === 'auth/user-not-found') ? 'No account found for this email.'
+            : err.message;
+    fail(m);
+  });
+}
+document.getElementById('emailSignInBtn')?.addEventListener('click', eksEmailSignIn);
+document.getElementById('authPassword')?.addEventListener('keydown', function(e){ if(e.key==='Enter') eksEmailSignIn(); });
+
+document.getElementById('authSignOutBtn')?.addEventListener('click', function() { _auth.signOut(); });
+</script>
+
+<!-- Question bank -->
+<script src="eks-question-bank.js"></script>
+
+<script>
+const CACHE_VERSION = '2026-06-10-v1';
+const MODULE_ID    = 'eks_m3';
+const SP_SKILL_ID  = 'eks';                    /* skillsProgress → skills.eks  (TODO: confirm slug when naming convention is locked) */
+const SP_MODULE_IDS = ['eks_m1','eks_m2','eks_m3','eks_m4','eks_m5'];
+const BANK_KEY     = 'm3';   // key into window.EKS_QUESTION_BANK
+
+console.log('%c[EKS Skill Track] eks-module-3.html — v' + CACHE_VERSION, 'color:#1a6eb5;font-weight:bold;');
+
+// ── Five tabs per section ──────────────────────────────────────────────
+//   1 Scenario (Set) · 2 Walkthrough (Learn) · 3 Best Practices (See)
+//   4 Lab (Do) · 5 Check Your Understanding (Self-Assess)
+const TAB_DEFS = [
+  { key:'scenario',  name:'Scenario',              verb:'Set' },
+  { key:'walkthrough', name:'Walkthrough',         verb:'Learn' },
+  { key:'best',      name:'Best Practices',        verb:'See' },
+  { key:'lab',       name:'Lab',                   verb:'Do' }
+  // 5th tab (Check Your Understanding / Self-Assess) is appended in code.
+];
+
+// ── Section teaching content ────────────────────────────────────────────────
+const SECTION_DATA = [
+  {
+    id: 's1', title: 'The static-credentials problem',
+    scenario: {
+      heading: 'A key in a Secret nobody rotates',
+      html: `
+        <p class="prose"><strong>Karthik</strong>, a DevOps Engineer, is reviewing how the team's services reach AWS. He finds an access key and secret pasted into a Kubernetes Secret, mounted into several pods so they can read from S3. The key was created over a year ago, is shared across services, and has never been rotated. Worse, it carries broad S3 permissions "to be safe."</p>
+        <p class="prose">If that key leaks — in a log, a backup, a compromised pod — an attacker gets standing, broad access that outlives any single request. Karthik's Lead wants the static key gone. The replacement is workload identity: <strong>IRSA</strong> or <strong>EKS Pod Identity</strong>. First, Karthik needs to articulate exactly why the static key is the problem.</p>
+        <div class="callout"><strong>Why this matters:</strong> a long-lived credential embedded in a pod is the highest-value, lowest-effort target in a cluster. Everything in this module exists to replace it with short-lived, scoped, per-workload identity.</div>`
+    },
+    walkthrough: {
+      heading: 'Why static credentials are the wrong model',
+      html: `
+        <p class="prose">A pod that needs to call an AWS service must prove its identity to AWS somehow. The naive way is to give it a long-lived <strong>access key and secret</strong> — as an environment variable or a mounted Secret. It works, and it's exactly what you should not do.</p>
+        <p class="prose"><strong>The problems compound:</strong></p>
+        <ul style="font-size:16px;color:var(--text-dim);line-height:1.8;margin:0 0 16px;padding-left:22px;">
+          <li><strong>Long-lived.</strong> The credential is valid until someone manually rotates it — which, as Karthik found, often means never.</li>
+          <li><strong>Leak-prone.</strong> It can end up in logs, container images, backups, environment dumps, or a compromised pod — and once leaked, it keeps working.</li>
+          <li><strong>Over-shared.</strong> One key copied across many pods means one leak exposes all of them, and you can't tell which workload actually used it.</li>
+          <li><strong>Over-privileged.</strong> Broad "to be safe" permissions mean a leak grants far more than any one workload needed.</li>
+        </ul>
+        <p class="prose">The better model flips every one of these: credentials that are <strong>short-lived</strong> (they expire on their own), <strong>per-workload</strong> (each gets its own identity), and <strong>scoped</strong> (only the permissions that workload needs). On EKS, two mechanisms deliver exactly that — <strong>IRSA</strong> and <strong>EKS Pod Identity</strong> — by associating a Kubernetes service account with an IAM role, so the pod assumes the role and receives temporary credentials.</p>
+        <div class="example-block">
+          <div class="ex-label">The shift, concretely</div>
+          <strong>Before:</strong> a static key in a Secret, valid forever, broad S3 access, shared by five pods.<br><br>
+          <strong>After:</strong> each pod runs as a service account linked to an IAM role scoped to exactly the bucket it needs; the pod receives temporary credentials that auto-expire and auto-renew. Nothing permanent is stored anywhere.
+        </div>
+        <div class="callout callout-good"><strong>The reframe for Karthik:</strong> the goal isn't to rotate the key more often — it's to remove the long-lived key entirely and let the platform issue short-lived, scoped credentials per workload.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Security','Operational Excellence'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Never embed long-lived AWS keys in pods</div>
+          <div class="bp-body">Don't place access keys in environment variables, Secrets, or images. Use workload identity (IRSA or Pod Identity) so credentials are short-lived and issued per workload. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Prefer short-lived, auto-rotated credentials</div>
+          <div class="bp-body">Temporary credentials that expire and renew automatically remove the leak-and-it-works-forever risk and eliminate manual rotation toil. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Give each workload its own identity</div>
+          <div class="bp-body">Per-workload identity makes access auditable (you know which workload did what) and contains the blast radius of any single compromise. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Karthik is removing:</strong> a shared, never-rotated, over-privileged static key in a Secret — convenient, invisible, and the single worst credential to have leak.</div>`
+    },
+    lab: {
+      heading: 'Lab — find static credentials in a cluster',
+      intro: `<p class="prose">A read-mostly audit lab: you'll look for the anti-pattern — long-lived AWS keys sitting in Secrets or env vars — so you can recognize and target it. ~10 minutes. No destructive changes.</p>`,
+      steps: [
+        { t:'List Secrets and look for credential-shaped data', p:'Secrets named like aws/keys/credentials are a red flag worth inspecting.',
+          code:`kubectl get secrets -A\n<span class="cmt"># Look for names suggesting AWS keys, e.g. aws-credentials, s3-key</span>` },
+        { t:'Check pod specs for AWS env vars', p:'Static keys are often injected as AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env vars.',
+          code:`kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}{"/"}{.metadata.name}{"\\n"}{end}'\n<span class="cmt"># For a suspect pod:</span>\nkubectl get pod &lt;POD&gt; -n &lt;NS&gt; -o yaml | grep -i "AWS_ACCESS_KEY\\|AWS_SECRET" || echo "no static AWS env vars in this pod"` },
+        { t:'See which service account a pod uses', p:'This is the identity you will later link to an IAM role instead of a static key.',
+          code:`kubectl get pod &lt;POD&gt; -n &lt;NS&gt; -o jsonpath='{.spec.serviceAccountName}{"\\n"}'` },
+        { t:'Note the remediation target', p:'Any pod relying on a static key is a candidate to migrate to IRSA or Pod Identity in the next sections.',
+          code:`<span class="cmt"># Remediation: replace the static key with a service-account-to-IAM-role</span>\n<span class="cmt"># association (IRSA or Pod Identity), scoped to least privilege.</span>` }
+      ],
+      cleanup: `# Audit only — nothing to clean up.`
+    }
+  },
+
+  {
+    id: 's2', title: 'IRSA',
+    scenario: {
+      heading: 'Giving one pod access to one bucket',
+      html: `
+        <p class="prose"><strong>Anita</strong>, a DevOps Engineer, needs a specific service to read from a single S3 bucket — and only that. She's been told not to use a static key. The cluster already has an OIDC provider associated, and a colleague mentions <strong>IRSA</strong>: "link the pod's service account to an IAM role."</p>
+        <p class="prose">Anita needs to understand what IRSA actually wires together — the service account, the IAM role, the OIDC trust — so she can grant exactly this one scoped permission and nothing more.</p>
+        <div class="callout"><strong>Why this matters:</strong> IRSA is the established way to give a pod its own scoped AWS identity. Understanding its moving parts is what lets you grant least privilege rather than over-broad access.</div>`
+    },
+    walkthrough: {
+      heading: 'IAM Roles for Service Accounts, wired together',
+      html: `
+        <p class="prose"><strong>IRSA (IAM Roles for Service Accounts)</strong> associates a <strong>Kubernetes service account</strong> with an <strong>IAM role</strong>. A pod that runs as that service account assumes the role and receives short-lived, scoped AWS credentials — no static key anywhere.</p>
+        <p class="prose">Three pieces make it work:</p>
+        <ul style="font-size:16px;color:var(--text-dim);line-height:1.8;margin:0 0 16px;padding-left:22px;">
+          <li><strong>An OIDC identity provider</strong> associated with the cluster. This lets AWS IAM <em>trust</em> tokens issued by the cluster to its service accounts.</li>
+          <li><strong>An IAM role</strong> whose trust policy says "this specific service account, in this namespace, in this cluster, may assume me." Its permission policy grants only what the workload needs.</li>
+          <li><strong>A Kubernetes service account</strong> annotated with the role's ARN. Pods using this service account get a projected token, which is exchanged for the role's temporary credentials.</li>
+        </ul>
+        <p class="prose">At runtime, the pod's projected service-account token is presented to AWS STS, which (because of the OIDC trust) issues temporary credentials for the linked role. The AWS SDK in the pod picks these up automatically — your code calls S3 as normal, with no key in sight.</p>
+        <div class="example-block">
+          <div class="ex-label">Anita's case, concretely</div>
+          Create an IAM role with a policy allowing only <code>s3:GetObject</code> on <code>arn:aws:s3:::anita-reports/*</code>, trusted by the <code>reports-reader</code> service account in the <code>reporting</code> namespace. Annotate that service account with the role ARN. Her pod runs as <code>reports-reader</code> → reads that one bucket → nothing else.
+        </div>
+        <p class="prose">The key win over the node role: instead of every pod on the node sharing the node's broad permissions, <strong>each workload gets exactly its own scoped role</strong>.</p>
+        <div class="callout callout-good"><strong>The reframe:</strong> IRSA turns "which pod gets which AWS permissions" from a node-wide blanket into a per-service-account decision you control precisely.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Security','Operational Excellence'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Give each workload its own service-account-linked role</div>
+          <div class="bp-body">Don't reuse one role for many workloads. A role per service account keeps permissions scoped and access attributable. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Scope the role's trust policy tightly</div>
+          <div class="bp-body">Trust only the specific service account and namespace that should assume the role — not any service account in the cluster. The trust policy is part of least privilege. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Prefer IRSA over the node role for workload access</div>
+          <div class="bp-body">Relying on the node role gives every pod on the node the same permissions. IRSA replaces that with per-workload identity, shrinking the blast radius of any compromise. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout"><strong>Reading the tags:</strong> the assessment will ask you to map these to pillars and to pick the Well-Architected-aligned fix for an over-broad-access scenario.</div>`
+    },
+    lab: {
+      heading: 'Lab — set up IRSA for a workload',
+      intro: `<p class="prose">You'll associate an OIDC provider with your cluster (if needed), create an IRSA role scoped to one S3 action, and link it to a service account. ~15 minutes. eksctl automates most of the wiring.</p>`,
+      steps: [
+        { t:'Ensure the cluster has an OIDC provider', p:'IRSA needs an OIDC identity provider associated with the cluster. This is idempotent.',
+          code:`eksctl utils associate-iam-oidc-provider \\\n  --cluster sf-eks-lab --region ap-south-1 --approve` },
+        { t:'Create a service account linked to a scoped IAM role', p:'eksctl creates the IAM role, attaches the policy, and annotates the service account — all in one step.',
+          code:`eksctl create iamserviceaccount \\\n  --cluster sf-eks-lab --region ap-south-1 \\\n  --namespace reporting --name reports-reader \\\n  --attach-policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess \\\n  --approve\n<span class="cmt"># In production, attach a custom least-privilege policy, not the broad ReadOnly.</span>` },
+        { t:'Confirm the annotation', p:'The service account now carries the IAM role ARN — this is what links pod to role.',
+          code:`kubectl get serviceaccount reports-reader -n reporting -o yaml | grep -A2 annotations` },
+        { t:'Run a pod as that service account and test', p:'A pod using this service account receives temporary credentials for the role — no static key.',
+          code:`kubectl run aws-test --image=amazon/aws-cli -n reporting \\\n  --overrides='{"spec":{"serviceAccountName":"reports-reader"}}' \\\n  --command -- sleep 3600\nkubectl exec -it aws-test -n reporting -- aws sts get-caller-identity\n<span class="cmt"># The assumed-role ARN confirms IRSA is working.</span>` }
+      ],
+      cleanup: `kubectl delete pod aws-test -n reporting\neksctl delete iamserviceaccount --cluster sf-eks-lab --region ap-south-1 --namespace reporting --name reports-reader`
+    }
+  },
+
+  {
+    id: 's3', title: 'EKS Pod Identity',
+    scenario: {
+      heading: 'IRSA wiring that doesn\'t scale across clusters',
+      html: `
+        <p class="prose"><strong>The platform team</strong> runs a dozen EKS clusters. Setting up IRSA on each — associating an OIDC provider, crafting per-role trust policies that reference each cluster's OIDC issuer — has become repetitive and error-prone. A mistyped trust policy means a role silently can't be assumed, and debugging it eats hours.</p>
+        <p class="prose"><strong>Meghna</strong>, a DevOps Architect, hears that <strong>EKS Pod Identity</strong> offers the same per-workload identity with less per-cluster wiring. She needs to understand what it simplifies and when to choose it over IRSA.</p>
+        <div class="callout"><strong>Why this matters:</strong> IRSA is powerful but its per-cluster OIDC/trust-policy setup is friction at scale. Pod Identity targets exactly that friction.</div>`
+    },
+    walkthrough: {
+      heading: 'The same goal, less per-cluster wiring',
+      html: `
+        <p class="prose"><strong>EKS Pod Identity</strong> achieves the same outcome as IRSA — a Kubernetes service account linked to an IAM role so pods get short-lived, scoped credentials — but through an EKS-managed mechanism that removes much of IRSA's per-cluster setup.</p>
+        <p class="prose">The key difference: IRSA requires you to associate an OIDC provider per cluster and write IAM role trust policies that reference each cluster's OIDC issuer URL. <strong>Pod Identity uses a cluster add-on (the Pod Identity Agent) and a simple association API</strong> instead. You create a <strong>Pod Identity association</strong> linking a service account to a role, and the trust relationship is handled through an EKS service principal rather than per-cluster OIDC trust policies. Role trust becomes reusable and consistent across clusters.</p>
+        <div class="example-block">
+          <div class="ex-label">IRSA vs. Pod Identity, at a glance</div>
+          <strong>IRSA:</strong> per-cluster OIDC provider + role trust policy referencing that cluster's issuer. Mature, widely supported, fine-grained.<br><br>
+          <strong>Pod Identity:</strong> install the Pod Identity Agent add-on once, then create associations (service account → role) via a simple API. Role trust uses an EKS service principal, so roles are easier to reuse across many clusters.
+        </div>
+        <p class="prose"><strong>When to choose which.</strong> For Meghna's many-cluster estate, Pod Identity reduces repetitive trust-policy wiring and the errors that come with it. IRSA remains a solid choice where it's already established or where a specific feature needs it. Both deliver per-workload, short-lived, scoped credentials — the principle from Sections 1–2 is unchanged; this is about operational ergonomics at scale.</p>
+        <div class="callout callout-good"><strong>The reframe:</strong> Pod Identity doesn't change <em>what</em> you're doing (per-workload scoped identity) — it makes the <em>how</em> repeatable and less error-prone across a fleet of clusters.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Operational Excellence','Security'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Use Pod Identity to reduce per-cluster identity wiring</div>
+          <div class="bp-body">Across many clusters, Pod Identity's reusable associations avoid repetitive OIDC trust-policy setup, cutting a common source of configuration error. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Keep credentials short-lived and scoped either way</div>
+          <div class="bp-body">Whether IRSA or Pod Identity, the security principle holds: per-workload, short-lived, least-privilege credentials — never static keys. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Choose deliberately, don't mix carelessly</div>
+          <div class="bp-body">Pick IRSA or Pod Identity per cluster/workload with a clear rationale; document which is used where so the access model stays understandable. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The friction Meghna is removing:</strong> hand-written per-cluster OIDC trust policies that silently break on a typo and cost hours to debug.</div>`
+    },
+    lab: {
+      heading: 'Lab — create a Pod Identity association',
+      intro: `<p class="prose">You'll install the Pod Identity Agent add-on, create an association linking a service account to an IAM role, and confirm a pod receives credentials — with no OIDC trust policy to hand-craft. ~15 minutes.</p>`,
+      steps: [
+        { t:'Install the Pod Identity Agent add-on', p:'This cluster add-on enables Pod Identity associations.',
+          code:`eksctl create addon \\\n  --cluster sf-eks-lab --region ap-south-1 \\\n  --name eks-pod-identity-agent` },
+        { t:'Create a service account', p:'No IAM annotation needed here — the association handles the link.',
+          code:`kubectl create namespace billing\nkubectl create serviceaccount billing-reader -n billing` },
+        { t:'Associate the service account with an IAM role', p:'This replaces IRSA\'s per-cluster OIDC trust wiring with a single association call. Use a least-privilege role ARN from your sandbox.',
+          code:`aws eks create-pod-identity-association \\\n  --cluster-name sf-eks-lab --region ap-south-1 \\\n  --namespace billing --service-account billing-reader \\\n  --role-arn arn:aws:iam::&lt;ACCOUNT_ID&gt;:role/&lt;SCOPED_ROLE&gt;` },
+        { t:'Verify a pod gets the role', p:'A pod using the service account assumes the associated role — short-lived credentials, no static key, no OIDC trust policy authored.',
+          code:`kubectl run pi-test --image=amazon/aws-cli -n billing \\\n  --overrides='{"spec":{"serviceAccountName":"billing-reader"}}' \\\n  --command -- sleep 3600\nkubectl exec -it pi-test -n billing -- aws sts get-caller-identity` }
+      ],
+      cleanup: `kubectl delete pod pi-test -n billing\naws eks delete-pod-identity-association --cluster-name sf-eks-lab --region ap-south-1 --association-id &lt;ASSOCIATION_ID&gt;\nkubectl delete namespace billing`
+    }
+  },
+
+  {
+    id: 's4', title: 'Least-privilege access',
+    scenario: {
+      heading: 'A workload role with s3:* on everything',
+      html: `
+        <p class="prose"><strong>The team</strong> migrated off static keys — good — but the IAM roles they created for workloads were given broad permissions "to avoid permission errors during rollout." One reporting service's role carries <code>s3:*</code> on all buckets, when it only ever reads one.</p>
+        <p class="prose"><strong>Vikram</strong>, the DevOps Lead, points out that per-workload identity only delivers its security benefit if each role is actually scoped down. A compromised pod with <code>s3:*</code> is nearly as dangerous as the static key they removed. He wants every workload role pared to least privilege.</p>
+        <div class="callout"><strong>Why this matters:</strong> IRSA and Pod Identity give you the <em>mechanism</em> for per-workload identity, but least privilege is a <em>design choice</em> on top. A broad role squanders the benefit.</div>`
+    },
+    walkthrough: {
+      heading: 'Scoping a workload role to the minimum',
+      html: `
+        <p class="prose">Per-workload identity contains a compromise only as tightly as the role is scoped. The goal: each workload's role grants <strong>only the specific actions on the specific resources</strong> that workload needs — nothing more.</p>
+        <p class="prose">Least privilege has two dimensions to tighten:</p>
+        <ul style="font-size:16px;color:var(--text-dim);line-height:1.8;margin:0 0 16px;padding-left:22px;">
+          <li><strong>Actions.</strong> Grant <code>s3:GetObject</code>, not <code>s3:*</code>. List the exact API actions the workload calls, and allow only those.</li>
+          <li><strong>Resources.</strong> Scope to specific ARNs — one bucket, one path — not <code>*</code>. A role that can touch every bucket is barely better than the broad key you removed.</li>
+        </ul>
+        <p class="prose">The practical method: start from what the workload actually does, write the narrowest policy that allows it, and widen only when a real, understood need appears. Tools and access analyzers can help identify unused permissions to trim. The trust policy (who may assume the role) is part of this too — scope it to the specific service account, as covered in Section 2.</p>
+        <div class="example-block">
+          <div class="ex-label">Vikram's fix, concretely</div>
+          <strong>Before:</strong> <code>"Action": "s3:*", "Resource": "*"</code> — every action on every bucket.<br><br>
+          <strong>After:</strong> <code>"Action": "s3:GetObject", "Resource": "arn:aws:s3:::reports-bucket/*"</code> — read objects, one bucket. A compromise of this pod now reaches exactly one bucket's objects, read-only.
+        </div>
+        <div class="callout callout-good"><strong>The reframe:</strong> removing static keys was step one. Scoping each workload's role to least privilege is what actually shrinks the blast radius — it's where the security payoff is realized.</div>`
+    },
+    best: {
+      heading: 'Best practices — mapped to AWS Well-Architected',
+      pillars: ['Security','Operational Excellence'],
+      html: `
+        <div class="bp-item">
+          <div class="bp-head">Grant specific actions on specific resources</div>
+          <div class="bp-body">Scope policies to the exact API actions and resource ARNs a workload uses. Avoid wildcard actions (<code>s3:*</code>) and wildcard resources (<code>*</code>) in workload roles. <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Start narrow, widen only on real need</div>
+          <div class="bp-body">Begin from the workload's actual calls and grant the minimum. Add permissions only when a genuine, understood requirement appears — not preemptively "to be safe." <span class="wa-pillar">Security</span></div>
+        </div>
+        <div class="bp-item">
+          <div class="bp-head">Review and trim unused permissions</div>
+          <div class="bp-body">Use access analyzers and periodic review to find and remove permissions a role isn't using, keeping roles least-privilege over time. <span class="wa-pillar">Operational Excellence</span></div>
+        </div>
+        <div class="callout callout-bad"><strong>The anti-pattern Vikram is fixing:</strong> per-workload roles that exist but carry <code>s3:*</code> on <code>*</code> — the mechanism is right, the scoping defeats the point.</div>`
+    },
+    lab: {
+      heading: 'Lab — tighten a workload role to least privilege',
+      intro: `<p class="prose">You'll inspect a workload role's policy, identify over-broad permissions, and replace them with a scoped policy. ~10–15 minutes. Work against a sandbox role you own.</p>`,
+      steps: [
+        { t:'Inspect the current policy on a workload role', p:'Look for wildcard actions and resources — the things to tighten.',
+          code:`aws iam list-attached-role-policies --role-name &lt;WORKLOAD_ROLE&gt;\naws iam get-role-policy --role-name &lt;WORKLOAD_ROLE&gt; --policy-name &lt;INLINE_POLICY&gt; 2>/dev/null || echo "check attached managed policies above"` },
+        { t:'Draft a least-privilege policy', p:'Replace s3:* on * with the exact action and bucket ARN the workload needs. Save as least-priv.json.',
+          code:`<span class="cmt"># least-priv.json</span>\n{\n  "Version": "2012-10-17",\n  "Statement": [{\n    "Effect": "Allow",\n    "Action": ["s3:GetObject"],\n    "Resource": "arn:aws:s3:::reports-bucket/*"\n  }]\n}` },
+        { t:'Apply the scoped policy', p:'Attach the tightened policy and detach the broad one.',
+          code:`aws iam put-role-policy --role-name &lt;WORKLOAD_ROLE&gt; \\\n  --policy-name reports-read-scoped \\\n  --policy-document file://least-priv.json\n<span class="cmt"># Then remove the over-broad policy:</span>\n<span class="cmt"># aws iam detach-role-policy --role-name &lt;WORKLOAD_ROLE&gt; --policy-arn &lt;BROAD_POLICY_ARN&gt;</span>` },
+        { t:'Verify the workload still works, but scoped', p:'The pod should still read its one bucket and now be denied anything outside the scope.',
+          code:`<span class="cmt"># From the workload pod (e.g. the IRSA/Pod Identity pod from earlier):</span>\nkubectl exec -it &lt;POD&gt; -n &lt;NS&gt; -- aws s3 ls s3://reports-bucket/\n<span class="cmt"># A call to another bucket should now be AccessDenied — least privilege working.</span>` }
+      ],
+      cleanup: `# Role edits only. If this was your last EKS lab, tear down the cluster:\n# eksctl delete cluster --name sf-eks-lab --region ap-south-1`
+    }
+  }
+];
+
+// ── Build section panels from data + question bank ───────────────────────────
+function bankFor(sectionKey) {
+  try { return (window.EKS_QUESTION_BANK[BANK_KEY] || {})[sectionKey] || []; }
+  catch(e) { return []; }
+}
+
+function buildSections() {
+  const root = document.getElementById('sectionsRoot');
+  SECTION_DATA.forEach(function(sec, idx) {
+    const secNum = idx + 1;
+    const questions = bankFor(sec.id);
+    const panel = document.createElement('section');
+    panel.className = 'section-panel' + (secNum === 1 ? ' active' : '');
+    panel.id = 'section-' + secNum;
+
+    // Tab buttons (4 teaching + 1 self-assess), each with verb-caption
+    let tabsBtns = '';
+    TAB_DEFS.forEach(function(t, ti) {
+      tabsBtns += '<button class="tab-btn' + (ti===0?' active':'') + '" onclick="showTab(' + secNum + ',' + (ti+1) + ')">'
+        + '<span class="num">' + (ti+1) + '</span>'
+        + '<span class="tab-caption-wrap"><span class="tab-name">' + t.name + '</span><span class="tab-verb">' + t.verb + '</span></span>'
+        + '</button>';
+    });
+    tabsBtns += '<button class="tab-btn" onclick="showTab(' + secNum + ',5)">'
+      + '<span class="num">5</span>'
+      + '<span class="tab-caption-wrap"><span class="tab-name">Check Your Understanding</span><span class="tab-verb">Self-Assess</span></span>'
+      + '</button>';
+
+    // Teaching panes
+    let panes = '';
+
+    // 1 — Scenario
+    panes += buildPane(secNum, 1, 'Scenario · Set', sec.scenario.heading, sec.scenario.html, 2);
+    // 2 — Walkthrough
+    panes += buildPane(secNum, 2, 'Walkthrough · Learn', sec.walkthrough.heading, sec.walkthrough.html, 3);
+    // 3 — Best Practices (with pillar legend)
+    let bestIntro = '';
+    if (sec.best.pillars && sec.best.pillars.length) {
+      bestIntro = '<div class="wa-legend">Well-Architected pillars in play: ' + sec.best.pillars.join(' · ') + '</div>';
+    }
+    panes += buildPane(secNum, 3, 'Best Practices · See', sec.best.heading, bestIntro + sec.best.html, 4);
+    // 4 — Lab
+    let labHtml = sec.lab.intro || '';
+    labHtml += '<div class="lab-caveat"><strong>⚠ Run in your own AWS sandbox only.</strong> These steps create real, billable AWS resources (EKS clusters, EC2 nodes, load balancers). Use a personal/sandbox account, follow the cleanup step at the end, and never run them against shared or production infrastructure.</div>';
+    sec.lab.steps.forEach(function(st, si) {
+      labHtml += '<div class="lab-step">'
+        + '<div class="lab-step-head"><span class="ls-num">' + (si+1) + '</span>' + st.t + '</div>'
+        + (st.p ? '<p>' + st.p + '</p>' : '')
+        + '<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>' + st.code + '</code></div>'
+        + '</div>';
+    });
+    if (sec.lab.cleanup) {
+      labHtml += '<div class="lab-cleanup"><strong>🧹 Clean up to avoid charges:</strong> when you\'re done, remove what you created.'
+        + '<div class="code-block" style="margin-top:10px;"><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>' + sec.lab.cleanup + '</code></div></div>';
+    }
+    panes += buildPane(secNum, 4, 'Lab · Do', sec.lab.heading, labHtml, 5);
+
+    // 5 — Check Your Understanding (quiz)
+    let qHtml = '';
+    questions.forEach(function(q, qi) {
+      let opts = '';
+      q.options.forEach(function(opt, oi) {
+        opts += '<label class="option"><input type="radio" name="s' + secNum + '_q' + (qi+1) + '" value="' + oi + '"> ' + opt + '</label>';
+      });
+      qHtml += '<div class="question-block">'
+        + '<div class="q-num">Question ' + (qi+1) + ' of ' + questions.length + '</div>'
+        + '<div class="q-text">' + q.q + '</div>'
+        + '<div class="options">' + opts + '</div>'
+        + '</div>';
+    });
+
+    panes += '<div class="tab-pane" id="pane-' + secNum + '-5">'
+      + '<div class="tab-label">Check Your Understanding · Self-Assess</div>'
+      + '<div class="tab-heading">Check your understanding</div>'
+      + '<div class="questions-wrap" id="questionsWrap-' + secNum + '">'
+      + '<p class="assessment-sub">Answer all ' + questions.length + ' questions to complete this section. Questions draw on all four tabs — including the Best Practices / Well-Architected mappings. Your answers are saved.</p>'
+      + qHtml
+      + '<button class="submit-btn" id="submitBtn-' + secNum + '" disabled>Submit answers</button>'
+      + '<div class="submit-note" id="submitNote-' + secNum + '">Select an answer for each question to submit.</div>'
+      + '</div>'
+      + '<div class="submitted-wrap hidden" id="submittedWrap-' + secNum + '">'
+      + '<div class="submitted-icon">✓</div><div class="submitted-title">Section complete</div>'
+      + '<div class="submitted-body">Your answers have been recorded and this section is marked complete.</div>'
+      + '<button class="ghost-btn redo-btn" id="redoBtn-' + secNum + '" style="margin-top:14px;">&#x21BA; Redo section</button>'
+      + '</div>'
+      + '</div>';
+
+    panel.innerHTML = '<div class="tabs-wrap"><div class="tabs">' + tabsBtns + '</div></div>'
+      + '<div class="tab-body">' + panes + '</div>';
+    root.appendChild(panel);
+  });
+}
+
+function buildPane(secNum, tabNum, label, heading, html, nextTab) {
+  const nav = '<div class="divider"></div><div class="tab-nav-row"><span></span>'
+    + '<button class="continue-btn" onclick="showTab(' + secNum + ',' + nextTab + ')">Continue →</button></div>';
+  return '<div class="tab-pane' + (tabNum===1?' active':'') + '" id="pane-' + secNum + '-' + tabNum + '">'
+    + '<div class="tab-label">' + label + '</div>'
+    + '<div class="tab-heading">' + heading + '</div>'
+    + html + nav + '</div>';
+}
+
+// ── Copy-to-clipboard for lab code blocks ────────────────────────────────────
+function copyCode(btn) {
+  const code = btn.parentElement.querySelector('code');
+  const text = code ? code.innerText : '';
+  navigator.clipboard.writeText(text).then(function(){
+    const orig = btn.textContent; btn.textContent = 'COPIED';
+    setTimeout(function(){ btn.textContent = orig; }, 1400);
+  }).catch(function(){ /* clipboard unavailable; no-op */ });
+}
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function toggleRefresh() {
+  var t = document.getElementById('refreshToggle');
+  var p = document.getElementById('refreshPanel');
+  if (!t || !p) return;
+  var open = p.classList.toggle('open');
+  t.classList.toggle('open', open);
+  var chev = t.querySelector('.rt-chev');
+  if (chev) chev.textContent = open ? '▲ CLOSE' : '▼ OPEN';
+}
+
+function showSection(n) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.section-pill').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + n)?.classList.add('active');
+  document.querySelector('.section-pill[data-sec="' + n + '"]')?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function showTab(sec, t) {
+  const panel = document.getElementById('section-' + sec);
+  if (!panel) return;
+  panel.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  panel.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  panel.querySelector('#pane-' + sec + '-' + t)?.classList.add('active');
+  panel.querySelectorAll('.tab-btn')[t-1]?.classList.add('active');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+function loadSec(secNum) {
+  const k = window.eksLearnerKey('s' + secNum);
+  try { return JSON.parse(localStorage.getItem(k)) || {}; } catch(e) { return {}; }
+}
+function saveSec(secNum, s) {
+  const k = window.eksLearnerKey('s' + secNum);
+  localStorage.setItem(k, JSON.stringify(s));
+}
+function allSectionsDone() {
+  for (let i = 1; i <= SECTION_DATA.length; i++) {
+    if (!loadSec(i).complete) return false;
+  }
+  return true;
+}
+function updateModuleProgress() {
+  let done = 0;
+  for (let i = 1; i <= SECTION_DATA.length; i++) {
+    if (loadSec(i).complete) {
+      done++;
+      document.querySelector('.section-pill[data-sec="' + i + '"]')?.classList.add('done');
+    }
+  }
+  const el = document.getElementById('moduleProgress');
+  if (el) el.textContent = done + ' of ' + SECTION_DATA.length + ' sections complete';
+  if (done >= SECTION_DATA.length) cpWriteModuleComplete();
+}
+
+function wireSection(secNum) {
+  const questions = bankFor('s' + secNum);
+  const qCount = questions.length;
+  const submitBtn = document.getElementById('submitBtn-' + secNum);
+  const note = document.getElementById('submitNote-' + secNum);
+
+  function checkAll() {
+    let answered = 0;
+    for (let i = 1; i <= qCount; i++) {
+      if (document.querySelector('input[name="s' + secNum + '_q' + i + '"]:checked')) answered++;
+    }
+    const all = answered === qCount;
+    if (submitBtn) submitBtn.disabled = !all;
+    if (note) note.textContent = all ? 'Ready to submit.' : 'Select an answer for each question to submit.';
+  }
+
+  document.querySelectorAll('#questionsWrap-' + secNum + ' input[type="radio"]').forEach(function(r) {
+    r.addEventListener('change', checkAll);
+  });
+
+  function showSubmitted() {
+    document.getElementById('questionsWrap-' + secNum)?.classList.add('hidden');
+    document.getElementById('submittedWrap-' + secNum)?.classList.remove('hidden');
+  }
+
+  if (submitBtn) submitBtn.addEventListener('click', function() {
+    const answers = {};
+    for (let i = 1; i <= qCount; i++) {
+      const v = document.querySelector('input[name="s' + secNum + '_q' + i + '"]:checked')?.value;
+      answers['q' + i] = v != null ? parseInt(v, 10) : null;
+    }
+    const correct = {};
+    questions.forEach(function(q, qi) { correct['q' + (qi+1)] = q.correctIndex; });
+    let score = 0;
+    for (let i = 1; i <= qCount; i++) { if (answers['q'+i] === correct['q'+i]) score++; }
+
+    const s = loadSec(secNum);
+    s.sectionId   = 's' + secNum;
+    s.answers     = answers;
+    s.correct     = correct;
+    s.score       = score;
+    s.total       = qCount;
+    s.submittedAt = new Date().toISOString();
+    s.complete    = true;
+    saveSec(secNum, s);
+
+    showSubmitted();
+    document.querySelector('.section-pill[data-sec="' + secNum + '"]')?.classList.add('done');
+    updateModuleProgress();
+  });
+
+  const redo = document.getElementById('redoBtn-' + secNum);
+  if (redo) redo.addEventListener('click', function() {
+    const k = window.eksLearnerKey('s' + secNum);
+    localStorage.removeItem(k);
+    document.getElementById('questionsWrap-' + secNum)?.classList.remove('hidden');
+    document.getElementById('submittedWrap-' + secNum)?.classList.add('hidden');
+    document.querySelectorAll('#questionsWrap-' + secNum + ' input[type="radio"]').forEach(function(r){ r.checked = false; });
+    if (submitBtn) submitBtn.disabled = true;
+    if (note) note.textContent = 'Select an answer for each question to submit.';
+    document.querySelector('.section-pill[data-sec="' + secNum + '"]')?.classList.remove('done');
+    updateModuleProgress();
+  });
+
+  // Restore submitted state
+  if (loadSec(secNum).submittedAt) showSubmitted();
+}
+
+document.addEventListener('learnerReady', function() {
+  cpEnsureModuleStarted();
+  for (let i = 1; i <= SECTION_DATA.length; i++) wireSection(i);
+  updateModuleProgress();
+});
+
+// ── skillsProgress (uid-keyed; skill → module map) ───────────────────────────
+// Separate from courseProgress: skills are "attained", not certified.
+//   skillsProgress/{uid} → { skills: { eks: { skillStartedOn, moduleInProgress,
+//     modules: { eks_m1: {startedOn, completedOn, timeTaken}, ... },
+//     skillAttainedOn } } }
+function spNow() {
+  var d = new Date(); var pad = function(n){ return String(n).padStart(2,'0'); };
+  return { date: d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),
+           time: pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()), ms: d.getTime() };
+}
+function spFmtDuration(ms) {
+  if (ms == null || ms < 0) return null;
+  var s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  if (h > 0) return h+'h '+m+'m '+sec+'s';
+  if (m > 0) return m+'m '+sec+'s';
+  return sec+'s';
+}
+function spDb() { return firebase.firestore(window._fbApp); }
+function spDocRef() { return spDb().collection('skillsProgress').doc(window._learnerUid); }
+function spReady() { return window._fbApp && window._learnerUid && window._learnerUid !== 'anon'; }
+
+function cpEnsureModuleStarted() {
+  if (!spReady()) return;
+  var ref = spDocRef();
+  ref.get().then(function(snap){
+    var data = snap.exists ? (snap.data() || {}) : {};
+    var skill = (data.skills && data.skills[SP_SKILL_ID]) || {};
+    var mods = skill.modules || {};
+    var t = spNow();
+    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, skills: {} };
+    update.skills[SP_SKILL_ID] = { moduleInProgress: MODULE_ID, modules: {} };
+    if (!skill.skillStartedOn) { update.skills[SP_SKILL_ID].skillStartedOn = t.date; update.skills[SP_SKILL_ID].skillStartedAt = t.time; }
+    if (!mods[MODULE_ID] || !mods[MODULE_ID].startedOn) {
+      update.skills[SP_SKILL_ID].modules[MODULE_ID] = { startedOn: t.date, startedAt: t.time };
+    }
+    ref.set(update, { merge: true }).catch(function(e){ console.warn('[skillsProgress] start write failed:', e.message); });
+  }).catch(function(e){ console.warn('[skillsProgress] start read failed:', e.message); });
+}
+
+function cpWriteModuleComplete() {
+  if (!spReady()) return;
+  var ref = spDocRef();
+  ref.get().then(function(snap){
+    var data = snap.exists ? (snap.data() || {}) : {};
+    var skill = (data.skills && data.skills[SP_SKILL_ID]) || {};
+    var mods = skill.modules || {};
+    if (mods[MODULE_ID] && mods[MODULE_ID].completedOn) return; // idempotent
+    var t = spNow();
+    var startMs = null, mEntry = mods[MODULE_ID];
+    if (mEntry && mEntry.startedOn && mEntry.startedAt) startMs = new Date(mEntry.startedOn + 'T' + mEntry.startedAt).getTime();
+    var moduleTimeTaken = startMs != null ? spFmtDuration(t.ms - startMs) : null;
+
+    var skillUpdate = { modules: {} };
+    skillUpdate.modules[MODULE_ID] = { completedOn: t.date, completedAt: t.time, timeTaken: moduleTimeTaken };
+    if (skill.moduleInProgress === MODULE_ID) skillUpdate.moduleInProgress = null;
+
+    var completedCount = 0;
+    SP_MODULE_IDS.forEach(function(id){
+      if (id === MODULE_ID) { completedCount++; return; }
+      if (mods[id] && mods[id].completedOn) completedCount++;
+    });
+    if (completedCount >= SP_MODULE_IDS.length && !skill.skillAttainedOn) {
+      skillUpdate.skillAttainedOn = t.date; skillUpdate.skillAttainedAt = t.time;
+      if (skill.skillStartedOn && skill.skillStartedAt) {
+        var sStart = new Date(skill.skillStartedOn + 'T' + skill.skillStartedAt).getTime();
+        skillUpdate.timeTaken = spFmtDuration(t.ms - sStart);
+      }
+    }
+    var update = { email: window._learnerEmail || null, name: window._learnerEmail || null, skills: {} };
+    update.skills[SP_SKILL_ID] = skillUpdate;
+    ref.set(update, { merge: true }).catch(function(e){ console.warn('[skillsProgress] complete write failed:', e.message); });
+  }).catch(function(e){ console.warn('[skillsProgress] complete read failed:', e.message); });
+}
+
+// Cache busting on internal links
+(function() {
+  function addVersion(url) {
+    if (!url || url.startsWith('http') || url.startsWith('#') || url.startsWith('mailto')) return url;
+    if (!url.endsWith('.html') && !url.includes('.html?')) return url;
+    const sep = url.includes('?') ? '&' : '?';
+    if (url.includes('v=' + CACHE_VERSION)) return url;
+    return url + sep + 'v=' + CACHE_VERSION;
+  }
+  document.querySelectorAll('a[href]').forEach(a => { a.href = addVersion(a.getAttribute('href')); });
+})();
+
+// Build panels immediately (content is static; auth gates the overlay only)
+buildSections();
+</script>
+
+</body>
+</html>
